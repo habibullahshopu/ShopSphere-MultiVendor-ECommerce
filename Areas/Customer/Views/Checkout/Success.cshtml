@@ -1,0 +1,237 @@
+﻿@model ShopSphere.Models.Order
+
+@{
+    ViewData["Title"] = "Order Successful";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-5 text-center">
+
+                    <!-- Success Icon -->
+                    <div style="font-size: 80px;">
+                        ✅
+                    </div>
+
+                    <h1 class="fw-bold mt-3">
+                        Order Placed Successfully!
+                    </h1>
+
+                    <p class="text-muted fs-5">
+                        Thank you for shopping with ShopSphere.
+                    </p>
+
+
+                    <!-- Order Number -->
+                    <div class="alert alert-success mt-4">
+
+                        <h5 class="fw-bold mb-1">
+                            Order #@Model.Id
+                        </h5>
+
+                        <div>
+                            Your order has been received successfully.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Order Info -->
+                    <div class="card bg-light border-0 rounded-4 mt-4">
+
+                        <div class="card-body p-4 text-start">
+
+                            <h4 class="fw-bold mb-4">
+                                Order Summary
+                            </h4>
+
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span class="text-muted">
+                                    Customer
+                                </span>
+
+                                <span class="fw-semibold">
+                                    @Model.CustomerName
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span class="text-muted">
+                                    Email
+                                </span>
+
+                                <span class="fw-semibold">
+                                    @Model.CustomerEmail
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span class="text-muted">
+                                    Order Status
+                                </span>
+
+                                <span class="badge bg-warning text-dark">
+                                    @Model.Status
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span class="text-muted">
+                                    Payment Status
+                                </span>
+
+                                <span class="badge bg-secondary">
+                                    @Model.PaymentStatus
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span class="text-muted">
+                                    Subtotal
+                                </span>
+
+                                <span class="fw-semibold">
+                                    ৳ @Model.Subtotal.ToString("N2")
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span class="text-muted">
+                                    Shipping
+                                </span>
+
+                                <span class="fw-semibold">
+
+                                    @if (Model.ShippingFee == 0)
+                                    {
+                                        <span class="text-success">
+                                            Free
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @:৳ @Model.ShippingFee.ToString("N2")
+                                    }
+
+                                </span>
+
+                            </div>
+
+
+                            <hr />
+
+
+                            <div class="d-flex justify-content-between">
+
+                                <span class="fw-bold fs-5">
+                                    Total
+                                </span>
+
+                                <span class="fw-bold fs-4 text-primary">
+                                    ৳ @Model.TotalAmount.ToString("N2")
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Shipping Address -->
+                    <div class="card border-0 bg-light rounded-4 mt-4">
+
+                        <div class="card-body p-4 text-start">
+
+                            <h5 class="fw-bold mb-3">
+                                Shipping Information
+                            </h5>
+
+                            <p class="mb-1">
+                                <strong>Address:</strong>
+                                @Model.ShippingAddress
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>City:</strong>
+                                @Model.City
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Postal Code:</strong>
+                                @Model.PostalCode
+                            </p>
+
+                            <p class="mb-0">
+                                <strong>Phone:</strong>
+                                @Model.PhoneNumber
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Actions -->
+                    <div class="mt-4 d-flex justify-content-center gap-2 flex-wrap">
+
+                        <a asp-area="Customer"
+                           asp-controller="Products"
+                           asp-action="Index"
+                           class="btn btn-primary px-4">
+
+                            🛍️ Continue Shopping
+
+                        </a>
+
+
+                        <a asp-area="Customer"
+                           asp-controller="Home"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary px-4">
+
+                            ← Customer Home
+
+                        </a>
+
+                    </div>
+
+
+                    <p class="text-muted small mt-4 mb-0">
+
+                        Your order details have been saved successfully.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

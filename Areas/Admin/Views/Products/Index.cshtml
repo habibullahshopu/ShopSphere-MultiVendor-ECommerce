@@ -1,0 +1,443 @@
+﻿@model IEnumerable<ShopSphere.Models.Product>
+@using ShopSphere.Helpers
+@{
+    ViewData["Title"] = "Products";
+
+    var currentSearch = ViewBag.Search?.ToString() ?? "";
+    var currentCategoryId = ViewBag.CategoryId as int?;
+    var currentStatus = ViewBag.Status?.ToString() ?? "";
+    var currentStock = ViewBag.Stock?.ToString() ?? "";
+    var currentSort = ViewBag.Sort?.ToString() ?? "";
+
+    var categories = ViewBag.Categories as IEnumerable<ShopSphere.Models.Category>;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="fw-bold mb-2">Products 📦</h1>
+        <p class="text-muted mb-0">
+            Manage all your marketplace products from one place.
+        </p>
+    </div>
+
+    <a asp-area="Admin"
+       asp-controller="Products"
+       asp-action="Create"
+       class="btn btn-primary px-4 py-2">
+        + Add New Product
+    </a>
+</div>
+
+<!-- Product Filter Card -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h5 class="fw-bold mb-1">🔍 Search & Filter Products</h5>
+                <p class="text-muted mb-0">
+                    Find and organize products easily.
+                </p>
+            </div>
+        </div>
+
+        <form asp-area="Admin"
+              asp-controller="Products"
+              asp-action="Index"
+              method="get">
+
+            <div class="row g-3">
+
+                <!-- Search -->
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-semibold">
+                        Search
+                    </label>
+
+                    <input type="text"
+                           name="search"
+                           value="@currentSearch"
+                           class="form-control"
+                           placeholder="Search products or categories..." />
+                </div>
+
+                <!-- Category -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-semibold">
+                        Category
+                    </label>
+
+                    <select name="categoryId"
+                            class="form-select">
+
+                        <option value="">All Categories</option>
+
+                        @if (categories != null)
+                        {
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.Id"
+                                        selected="@(currentCategoryId == category.Id)">
+                                    @category.Name
+                                </option>
+                            }
+                        }
+
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-semibold">
+                        Status
+                    </label>
+
+                    <select name="status"
+                            class="form-select">
+
+                        <option value="">All Status</option>
+
+                        <option value="active"
+                                selected="@(currentStatus == "active")">
+                            Active
+                        </option>
+
+                        <option value="inactive"
+                                selected="@(currentStatus == "inactive")">
+                            Inactive
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Stock -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-semibold">
+                        Stock
+                    </label>
+
+                    <select name="stock"
+                            class="form-select">
+
+                        <option value="">All Stock</option>
+
+                        <option value="instock"
+                                selected="@(currentStock == "instock")">
+                            In Stock
+                        </option>
+
+                        <option value="lowstock"
+                                selected="@(currentStock == "lowstock")">
+                            Low Stock
+                        </option>
+
+                        <option value="outofstock"
+                                selected="@(currentStock == "outofstock")">
+                            Out of Stock
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-semibold">
+                        Sort By
+                    </label>
+
+                    <select name="sort"
+                            class="form-select">
+
+                        <option value=""
+                                selected="@string.IsNullOrWhiteSpace(currentSort)">
+                            Newest First
+                        </option>
+
+                        <option value="oldest"
+                                selected="@(currentSort == "oldest")">
+                            Oldest First
+                        </option>
+
+                        <option value="price_asc"
+                                selected="@(currentSort == "price_asc")">
+                            Price: Low to High
+                        </option>
+
+                        <option value="price_desc"
+                                selected="@(currentSort == "price_desc")">
+                            Price: High to Low
+                        </option>
+
+                        <option value="name_asc"
+                                selected="@(currentSort == "name_asc")">
+                            Name: A to Z
+                        </option>
+
+                        <option value="name_desc"
+                                selected="@(currentSort == "name_desc")">
+                            Name: Z to A
+                        </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+
+                <a asp-area="Admin"
+                   asp-controller="Products"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary px-4">
+                    ↻ Clear All
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    🔎 Apply Filters
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- Products Table -->
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">All Products</h3>
+
+                @if (!string.IsNullOrWhiteSpace(currentSearch) ||
+                     currentCategoryId.HasValue ||
+                     !string.IsNullOrWhiteSpace(currentStatus) ||
+                     !string.IsNullOrWhiteSpace(currentStock))
+                {
+                    <p class="text-muted mb-0">
+                        Filtered results: @Model.Count() product(s) found
+                    </p>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        Total: @Model.Count() product(s)
+                    </p>
+                }
+            </div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table align-middle table-hover">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            int count = 1;
+                        }
+
+                        @foreach (var product in Model)
+                        {
+                            <tr>
+
+                                <td>@count</td>
+
+                                <!-- Product Image -->
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl"
+                                             alt="@product.Name"
+                                             style="width:55px; height:55px; object-fit:cover;"
+                                             class="rounded-3 border" />
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center justify-content-center bg-light rounded-3 border"
+                                             style="width:55px; height:55px; font-size:25px;">
+                                            📦
+                                        </div>
+                                    }
+                                </td>
+
+                                <!-- Product Name -->
+                                <td>
+                                    <div class="fw-bold">
+                                        @product.Name
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(product.Description))
+                                    {
+                                        <small class="text-muted">
+                                            @(product.Description.Length > 50
+                                                ? product.Description.Substring(0, 50) + "..."
+                                                : product.Description)
+                                        </small>
+                                    }
+                                </td>
+
+                                <!-- Category -->
+                                <td>
+                                    <span class="badge bg-light text-dark border px-3 py-2">
+                                        📁 @(product.Category?.Name ?? "No Category")
+                                    </span>
+                                </td>
+
+                                <!-- Price -->
+                                <td>
+                                    <span class="fw-bold text-primary">
+                                        ৳ @product.Price.ToString("N2")
+                                    </span>
+                                </td>
+
+                                <!-- Stock -->
+                                <td>
+                                    @if (product.StockQuantity > 10)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">
+                                            @product.StockQuantity In Stock
+                                        </span>
+                                    }
+                                    else if (product.StockQuantity > 0)
+                                    {
+                                        <span class="badge bg-warning text-dark px-3 py-2">
+                                            @product.StockQuantity Low Stock
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger px-3 py-2">
+                                            Out of Stock
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- Status -->
+                                <td>
+                                    @if (product.IsActive)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">
+                                            Inactive
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- Created Date -->
+                                <td>
+                                  @BangladeshTimeHelper.ToBangladeshTime(product.CreatedAt).ToString("dd MMM yyyy")
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="text-end">
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Products"
+                                       asp-action="Edit"
+                                       asp-route-id="@product.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        ✏️ Edit
+                                    </a>
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Products"
+                                       asp-action="Delete"
+                                       asp-route-id="@product.Id"
+                                       class="btn btn-sm btn-outline-danger ms-1">
+                                        🗑️ Delete
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            count++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+
+                @if (!string.IsNullOrWhiteSpace(currentSearch) ||
+                     currentCategoryId.HasValue ||
+                     !string.IsNullOrWhiteSpace(currentStatus) ||
+                     !string.IsNullOrWhiteSpace(currentStock))
+                {
+                    <div style="font-size: 60px;">
+                        🔎
+                    </div>
+
+                    <h3 class="fw-bold mt-3">
+                        No matching products found
+                    </h3>
+
+                    <p class="text-muted">
+                        No products match your current search or filter criteria.
+                    </p>
+
+                    <a asp-area="Admin"
+                       asp-controller="Products"
+                       asp-action="Index"
+                       class="btn btn-outline-primary px-4">
+                        ↻ Clear Filters
+                    </a>
+                }
+                else
+                {
+                    <div style="font-size: 60px;">
+                        📦
+                    </div>
+
+                    <h3 class="fw-bold mt-3">
+                        No products found
+                    </h3>
+
+                    <p class="text-muted">
+                        Start building your marketplace by adding your first product.
+                    </p>
+
+                    <a asp-area="Admin"
+                       asp-controller="Products"
+                       asp-action="Create"
+                       class="btn btn-primary px-4 py-2">
+                        + Add First Product
+                    </a>
+                }
+
+            </div>
+        }
+
+    </div>
+</div>

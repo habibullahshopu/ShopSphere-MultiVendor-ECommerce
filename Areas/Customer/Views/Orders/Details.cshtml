@@ -1,0 +1,385 @@
+﻿@model ShopSphere.Models.Order
+@using ShopSphere.Helpers
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+
+    bool hasReturnRequest = ViewBag.HasReturnRequest == true;
+
+    int? returnRequestId = ViewBag.ReturnRequestId != null
+        ? Convert.ToInt32(ViewBag.ReturnRequestId)
+        : null;
+}
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+
+        <div>
+            <h1 class="fw-bold mb-1">
+                Order #@Model.Id
+            </h1>
+
+            <p class="text-muted mb-0">
+                Placed on @BangladeshTimeHelper.ToBangladeshTime(Model.CreatedAt).ToString("dd MMM yyyy, hh:mm tt")
+            </p>
+        </div>
+
+        <a asp-area="Customer"
+           asp-controller="Orders"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Back to Orders
+        </a>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- ===================================== -->
+        <!-- LEFT: ORDER ITEMS -->
+        <!-- ===================================== -->
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        Order Items
+                    </h4>
+
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <div class="d-flex align-items-center gap-3 border-bottom pb-3 mb-3">
+
+                            <!-- Product Image -->
+                            @if (!string.IsNullOrWhiteSpace(item.Product?.ImageUrl))
+                            {
+                                <img src="@item.Product.ImageUrl"
+                                     alt="@item.ProductName"
+                                     style="width:75px; height:75px; object-fit:cover;"
+                                     class="rounded-3 border" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center bg-light rounded-3 border"
+                                     style="width:75px; height:75px; font-size:35px;">
+                                    📦
+                                </div>
+                            }
+
+
+                            <!-- Product Info -->
+                            <div class="flex-grow-1">
+
+                                <div class="fw-bold">
+                                    @item.ProductName
+                                </div>
+
+                                <small class="text-muted">
+                                    Qty: @item.Quantity × ৳ @item.UnitPrice.ToString("N2")
+                                </small>
+
+                            </div>
+
+
+                            <!-- Item Total -->
+                            <div class="fw-bold">
+                                ৳ @item.Subtotal.ToString("N2")
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- RETURN SECTION -->
+            <!-- ===================================== -->
+            @if (Model.PaymentStatus == "Paid")
+            {
+                <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+                    <div class="card-body p-4">
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                            <div>
+
+                                <h5 class="fw-bold mb-1">
+                                    Need to return this order?
+                                </h5>
+
+                                <p class="text-muted mb-0 small">
+                                    Submit a return request and our team will review it.
+                                </p>
+
+                            </div>
+
+
+                            @if (!hasReturnRequest)
+                            {
+                                <a asp-area="Customer"
+                                   asp-controller="Returns"
+                                   asp-action="Create"
+                                   asp-route-orderId="@Model.Id"
+                                   class="btn btn-outline-danger px-4">
+
+                                    <i class="bi bi-arrow-return-left me-1"></i>
+                                    Request Return
+
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-area="Customer"
+                                   asp-controller="Returns"
+                                   asp-action="Details"
+                                   asp-route-id="@returnRequestId"
+                                   class="btn btn-outline-dark px-4">
+
+                                    <i class="bi bi-eye me-1"></i>
+                                    View Return Request
+
+                                </a>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- RIGHT: ORDER SUMMARY -->
+        <!-- ===================================== -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        Order Summary
+                    </h4>
+
+
+                    <!-- Order Status -->
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Order Status
+                        </span>
+
+                        <span class="badge bg-warning text-dark">
+                            @Model.Status
+                        </span>
+
+                    </div>
+
+
+                    <!-- Payment Status -->
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Payment
+                        </span>
+
+                        <span class="badge @(Model.PaymentStatus == "Paid"
+                                                                                    ? "bg-success"
+                                                                                    : "bg-secondary")">
+
+                            @Model.PaymentStatus
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Subtotal -->
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Subtotal
+                        </span>
+
+                        <span class="fw-semibold">
+                            ৳ @Model.Subtotal.ToString("N2")
+                        </span>
+
+                    </div>
+
+
+                    <!-- Coupon -->
+                    @if (!string.IsNullOrWhiteSpace(Model.CouponCode))
+                    {
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span class="text-success">
+                                🎟️ Coupon
+                            </span>
+
+                            <span class="fw-semibold text-success">
+                                @Model.CouponCode
+                            </span>
+
+                        </div>
+                    }
+
+
+                    <!-- Discount -->
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span class="text-success">
+                                Coupon Discount
+                            </span>
+
+                            <span class="fw-semibold text-success">
+                                -৳ @Model.DiscountAmount.ToString("N2")
+                            </span>
+
+                        </div>
+                    }
+
+
+                    <!-- Shipping -->
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Shipping
+                        </span>
+
+                        <span class="fw-semibold">
+
+                            @if (Model.ShippingFee == 0)
+                            {
+                                <span class="text-success">
+                                    Free
+                                </span>
+                            }
+                            else
+                            {
+                                @:৳ @Model.ShippingFee.ToString("N2")
+                            }
+
+                        </span>
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <!-- Total -->
+
+                    <div class="d-flex justify-content-between">
+
+                        <span class="fw-bold fs-5">
+                            Total
+                        </span>
+
+                        <span class="fw-bold fs-4 text-primary">
+                            ৳ @Model.TotalAmount.ToString("N2")
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- SHIPPING INFORMATION -->
+            <!-- ===================================== -->
+
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">
+                        Shipping Information
+                    </h5>
+
+
+                    <div class="small mb-2">
+
+                        <strong>Name:</strong>
+
+                        @Model.CustomerName
+
+                    </div>
+
+
+                    <div class="small mb-2">
+
+                        <strong>Email:</strong>
+
+                        @Model.CustomerEmail
+
+                    </div>
+
+
+                    <div class="small mb-2">
+
+                        <strong>Address:</strong>
+
+                        @Model.ShippingAddress
+
+                    </div>
+
+
+                    <div class="small mb-2">
+
+                        <strong>City:</strong>
+
+                        @Model.City
+
+                    </div>
+
+
+                    <div class="small mb-2">
+
+                        <strong>Postal Code:</strong>
+
+                        @Model.PostalCode
+
+                    </div>
+
+
+                    <div class="small">
+
+                        <strong>Phone:</strong>
+
+                        @Model.PhoneNumber
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>

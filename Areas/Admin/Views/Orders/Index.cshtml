@@ -1,0 +1,463 @@
+﻿@model IEnumerable<ShopSphere.Models.Order>
+@using ShopSphere.Helpers
+
+@{
+    ViewData["Title"] = "Orders";
+
+    var currentSearch = ViewBag.Search?.ToString() ?? "";
+    var currentStatus = ViewBag.Status?.ToString() ?? "All";
+    var currentPaymentStatus = ViewBag.PaymentStatus?.ToString() ?? "All";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+    <div>
+        <h1 class="fw-bold mb-2">Orders 🛒</h1>
+
+        <p class="text-muted mb-0">
+            Manage customer orders and payment status.
+        </p>
+    </div>
+
+</div>
+
+
+
+<!-- Filters -->
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+
+    <div class="card-body p-4">
+
+        <form asp-area="Admin"
+              asp-controller="Orders"
+              asp-action="Index"
+              method="get">
+
+            <div class="row g-3">
+
+                <!-- Search -->
+                <div class="col-lg-5 col-md-6">
+
+                    <label class="form-label fw-semibold">
+                        Search
+                    </label>
+
+                    <input type="text"
+                           name="search"
+                           value="@currentSearch"
+                           class="form-control"
+                           placeholder="Search by order ID, customer name or email..." />
+
+                </div>
+
+
+                <!-- Order Status -->
+                <div class="col-lg-3 col-md-3">
+
+                    <label class="form-label fw-semibold">
+                        Order Status
+                    </label>
+
+                    <select name="status"
+                            class="form-select">
+
+                        <option value="All"
+                                selected="@(currentStatus == "All")">
+                            All Statuses
+                        </option>
+
+                        <option value="Pending"
+                                selected="@(currentStatus == "Pending")">
+                            Pending
+                        </option>
+
+                        <option value="Processing"
+                                selected="@(currentStatus == "Processing")">
+                            Processing
+                        </option>
+
+                        <option value="Shipped"
+                                selected="@(currentStatus == "Shipped")">
+                            Shipped
+                        </option>
+
+                        <option value="Delivered"
+                                selected="@(currentStatus == "Delivered")">
+                            Delivered
+                        </option>
+
+                        <option value="Cancelled"
+                                selected="@(currentStatus == "Cancelled")">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Payment Status -->
+                <div class="col-lg-3 col-md-3">
+
+                    <label class="form-label fw-semibold">
+                        Payment Status
+                    </label>
+
+                    <select name="paymentStatus"
+                            class="form-select">
+
+                        <option value="All"
+                                selected="@(currentPaymentStatus == "All")">
+                            All Payments
+                        </option>
+
+                        <option value="Pending"
+                                selected="@(currentPaymentStatus == "Pending")">
+                            Pending
+                        </option>
+
+                        <option value="Paid"
+                                selected="@(currentPaymentStatus == "Paid")">
+                            Paid
+                        </option>
+
+                        <option value="Failed"
+                                selected="@(currentPaymentStatus == "Failed")">
+                            Failed
+                        </option>
+
+                        <option value="Refunded"
+                                selected="@(currentPaymentStatus == "Refunded")">
+                            Refunded
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Search Button -->
+                <div class="col-lg-1 col-md-12 d-flex align-items-end">
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        🔎
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Clear Filters -->
+            @if (!string.IsNullOrWhiteSpace(currentSearch) ||
+                             currentStatus != "All" ||
+                             currentPaymentStatus != "All")
+            {
+                <div class="mt-3">
+
+                    <a asp-area="Admin"
+                       asp-controller="Orders"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary">
+
+                        ↻ Clear Filters
+
+                    </a>
+
+                </div>
+            }
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- Orders Table -->
+<!-- ========================= -->
+
+<div class="card border-0 shadow-sm rounded-4">
+
+    <div class="card-body p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+
+                <h3 class="fw-bold mb-1">
+                    All Orders
+                </h3>
+
+                <p class="text-muted mb-0">
+                    @Model.Count() order(s) found.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table align-middle table-hover">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <!-- Actual Order ID -->
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Customer
+                            </th>
+
+                            <th>
+                                Items
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                            <th>
+                                Order Status
+                            </th>
+
+                            <th>
+                                Payment
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th class="text-end">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+
+                                <!-- ========================= -->
+                                <!-- Actual Order ID -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    <span class="fw-bold">
+                                        #@order.Id
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Customer -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    <div class="fw-bold">
+                                        @order.CustomerName
+                                    </div>
+
+                                    <small class="text-muted">
+                                        @order.CustomerEmail
+                                    </small>
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Items -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    <span class="badge bg-light text-dark border">
+
+                                        @order.OrderItems.Sum(i => i.Quantity)
+
+                                        item(s)
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Total -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    <span class="fw-bold text-primary">
+
+                                        ৳ @order.TotalAmount.ToString("N2")
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Order Status -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    @if (order.Status == "Pending")
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+                                    }
+                                    else if (order.Status == "Processing")
+                                    {
+                                        <span class="badge bg-primary">
+                                            Processing
+                                        </span>
+                                    }
+                                    else if (order.Status == "Shipped")
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            Shipped
+                                        </span>
+                                    }
+                                    else if (order.Status == "Delivered")
+                                    {
+                                        <span class="badge bg-success">
+                                            Delivered
+                                        </span>
+                                    }
+                                    else if (order.Status == "Cancelled")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Cancelled
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            @order.Status
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Payment Status -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    @if (order.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success">
+                                            Paid
+                                        </span>
+                                    }
+                                    else if (order.PaymentStatus == "Failed")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Failed
+                                        </span>
+                                    }
+                                    else if (order.PaymentStatus == "Refunded")
+                                    {
+                                        <span class="badge bg-dark">
+                                            Refunded
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Pending
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Date -->
+                                <!-- ========================= -->
+
+                                <td>
+
+                                    @BangladeshTimeHelper.ToBangladeshTime(order.CreatedAt).ToString("dd MMM yyyy")
+
+                                </td>
+
+
+                                <!-- ========================= -->
+                                <!-- Action -->
+                                <!-- ========================= -->
+
+                                <td class="text-end">
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Orders"
+                                       asp-action="Details"
+                                       asp-route-id="@order.Id"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        View →
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- ========================= -->
+            <!-- Empty State -->
+            <!-- ========================= -->
+
+            <div class="text-center py-5">
+
+                <div style="font-size:70px;">
+                    🛒
+                </div>
+
+                <h3 class="fw-bold mt-3">
+                    No orders found
+                </h3>
+
+                <p class="text-muted">
+                    Customer orders will appear here.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>

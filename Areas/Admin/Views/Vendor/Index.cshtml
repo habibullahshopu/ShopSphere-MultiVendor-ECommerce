@@ -1,0 +1,237 @@
+﻿@model IEnumerable<ShopSphere.ViewModels.AdminVendorViewModel>
+
+@{
+    ViewData["Title"] = "Vendor Management";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Vendor Management</h2>
+            <p class="text-muted mb-0">
+                Review and manage vendor applications.
+            </p>
+        </div>
+
+        <span class="badge bg-primary fs-6 px-3 py-2">
+            Total Vendors: @Model.Count()
+        </span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-0">
+
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Store</th>
+                                <th>Vendor</th>
+                                <th>Location</th>
+                                <th>Commission</th>
+                                <th>Status</th>
+                                <th>Applied</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var vendor in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <strong>#@vendor.Id</strong>
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @vendor.StoreName
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(vendor.StoreDescription))
+                                        {
+                                            <small class="text-muted">
+                                                @(vendor.StoreDescription.Length > 60
+                                                    ? vendor.StoreDescription.Substring(0, 60) + "..."
+                                                    : vendor.StoreDescription)
+                                            </small>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @(vendor.FullName ?? "N/A")
+                                        </div>
+
+                                        <small class="text-muted">
+                                            @(vendor.Email ?? "No email")
+                                        </small>
+
+                                        @if (!string.IsNullOrWhiteSpace(vendor.PhoneNumber))
+                                        {
+                                            <br />
+                                            <small class="text-muted">
+                                                @vendor.PhoneNumber
+                                            </small>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @(vendor.City ?? "N/A")
+
+                                        @if (!string.IsNullOrWhiteSpace(vendor.Country))
+                                        {
+                                            <small class="text-muted">
+                                                <br />@vendor.Country
+                                            </small>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            @vendor.CommissionRate.ToString("0.00")%
+                                        </span>
+                                    </td>
+
+                                    <td>
+
+                                        @if (vendor.IsApproved && vendor.IsActive)
+                                        {
+                                            <span class="badge bg-success">
+                                                Approved
+                                            </span>
+                                        }
+                                        else if (!vendor.IsApproved && vendor.IsActive)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                Rejected
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+                                        @vendor.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <a asp-area="Admin"
+                                               asp-controller="Vendor"
+                                               asp-action="Details"
+                                               asp-route-id="@vendor.Id"
+                                               class="btn btn-sm btn-outline-primary">
+                                                Details
+                                            </a>
+
+                                            @if (!vendor.IsApproved && vendor.IsActive)
+                                            {
+                                                <form asp-area="Admin"
+                                                      asp-controller="Vendor"
+                                                      asp-action="Approve"
+                                                      asp-route-id="@vendor.Id"
+                                                      method="post"
+                                                      class="d-inline">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-success"
+                                                            onclick="return confirm('Approve this vendor?');">
+                                                        Approve
+                                                    </button>
+
+                                                </form>
+
+                                                <form asp-area="Admin"
+                                                      asp-controller="Vendor"
+                                                      asp-action="Reject"
+                                                      asp-route-id="@vendor.Id"
+                                                      method="post"
+                                                      class="d-inline">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-danger"
+                                                            onclick="return confirm('Reject this vendor?');">
+                                                        Reject
+                                                    </button>
+
+                                                </form>
+                                            }
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+
+                    <div class="display-4 mb-3">
+                        🏪
+                    </div>
+
+                    <h4>No Vendors Found</h4>
+
+                    <p class="text-muted mb-0">
+                        There are currently no vendor applications.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

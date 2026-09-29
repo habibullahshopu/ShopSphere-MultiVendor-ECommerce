@@ -1,0 +1,219 @@
+﻿@model IEnumerable<ShopSphere.Models.Product>
+
+@{
+    ViewData["Title"] = "My Products";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">My Products</h2>
+            <p class="text-muted mb-0">
+                Manage your store products, prices and inventory.
+            </p>
+        </div>
+
+        <a asp-area="Vendor"
+           asp-controller="Products"
+           asp-action="Create"
+           class="btn btn-primary">
+            + Add Product
+        </a>
+    </div>
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+
+                <div class="display-4 mb-3">
+                    📦
+                </div>
+
+                <h4 class="fw-bold">
+                    No Products Yet
+                </h4>
+
+                <p class="text-muted">
+                    You haven't added any products to your store yet.
+                </p>
+
+                <a asp-area="Vendor"
+                   asp-controller="Products"
+                   asp-action="Create"
+                   class="btn btn-primary">
+                    Add Your First Product
+                </a>
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var product in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <div class="d-flex align-items-center">
+
+                                            @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                            {
+                                                <img src="@product.ImageUrl"
+                                                     alt="@product.Name"
+                                                     style="width:55px;height:55px;object-fit:cover;"
+                                                     class="rounded me-3" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center me-3"
+                                                     style="width:55px;height:55px;">
+                                                    📦
+                                                </div>
+                                            }
+
+                                            <div>
+                                                <div class="fw-semibold">
+                                                    @product.Name
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    Product #@product.Id
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+
+                                    <td>
+                                        @(product.Category?.Name ?? "N/A")
+                                    </td>
+
+
+                                    <td>
+                                        <strong>
+                                            ৳@product.Price.ToString("N2")
+                                        </strong>
+                                    </td>
+
+
+                                    <td>
+                                        @if (product.StockQuantity <= 0)
+                                        {
+                                            <span class="badge bg-danger">
+                                                Out of Stock
+                                            </span>
+                                        }
+                                        else if (product.StockQuantity <= 5)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                @product.StockQuantity Low
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                @product.StockQuantity
+                                            </span>
+                                        }
+                                    </td>
+
+
+                                    <td>
+                                        @if (product.IsActive)
+                                        {
+                                            <span class="badge bg-success">
+                                                Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                Inactive
+                                            </span>
+                                        }
+                                    </td>
+
+
+                                    <td class="text-end">
+
+                                        <a asp-area="Vendor"
+                                           asp-controller="Products"
+                                           asp-action="Edit"
+                                           asp-route-id="@product.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+
+                                        <a asp-area="Vendor"
+                                           asp-controller="Products"
+                                           asp-action="Delete"
+                                           asp-route-id="@product.Id"
+                                           class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>

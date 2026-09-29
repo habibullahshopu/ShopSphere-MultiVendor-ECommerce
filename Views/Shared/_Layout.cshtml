@@ -1,0 +1,1172 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using ShopSphere.Data
+@using ShopSphere.Models
+
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext DbContext
+
+@{
+    var isAuthenticated =
+        User.Identity?.IsAuthenticated == true;
+
+    var currentUser = isAuthenticated
+        ? await UserManager.GetUserAsync(User)
+        : null;
+
+    var isAdmin =
+        User.IsInRole("Admin");
+
+    var isCustomer =
+        User.IsInRole("Customer");
+
+    var isApprovedVendor =
+        currentUser?.IsVendor == true &&
+        currentUser.IsVendorApproved == true;
+
+    var wishlistCount = 0;
+
+    if (isCustomer &&
+        !isAdmin &&
+        !string.IsNullOrWhiteSpace(currentUser?.Id))
+    {
+        wishlistCount = await DbContext.Wishlists
+            .AsNoTracking()
+            .CountAsync(w => w.UserId == currentUser.Id);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - ShopSphere
+    </title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+         SHOPSPHERE HEADER
+         ========================================================= -->
+
+    <header class="ss-site-header">
+
+        <!-- =====================================================
+             PROMO BAR
+             ===================================================== -->
+
+        <div class="ss-promo-bar">
+
+            <div class="container">
+
+                <div class="ss-promo-content">
+
+                    <div class="ss-promo-message">
+                        🎁
+                        <strong>Special Offer!</strong>
+                        Get up to <strong>50% off</strong> on selected items.
+                    </div>
+
+                    <a class="ss-promo-button"
+                       asp-area="Customer"
+                       asp-controller="Products"
+                       asp-action="Index">
+
+                        Shop Now <span>→</span>
+
+                    </a>
+
+                    <div class="ss-promo-links">
+
+                        <a asp-area=""
+                           asp-controller="TrackOrder"
+                           asp-action="Index"
+                           class="text-decoration-none">
+                            Track Order
+                        </a>
+                        <span class="ss-promo-separator">|</span>
+
+                        <a asp-area=""
+                           asp-controller="Support"
+                           asp-action="Index"
+                           class="text-decoration-none">
+                            Help &amp; Support
+                        </a>
+
+                        <span class="ss-promo-separator">|</span>
+
+                        @if (isCustomer && !isAdmin && !isApprovedVendor)
+                        {
+                            <a asp-area="Customer"
+                               asp-controller="Vendor"
+                               asp-action="Register">
+                                Sell on ShopSphere
+                            </a>
+                        }
+                        else if (!isAuthenticated)
+                        {
+                            <a asp-area=""
+                               asp-controller="Account"
+                               asp-action="Register">
+                                Sell on ShopSphere
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             MAIN HEADER
+             ===================================================== -->
+
+        <nav class="ss-main-header">
+
+            <div class="container">
+
+                <div class="ss-header-main-row">
+
+
+                    <!-- =================================================
+                         LOGO
+                         ================================================= -->
+
+                    <a class="ss-brand"
+                       asp-area="Customer"
+                       asp-controller="Home"
+                       asp-action="Index">
+
+                        <span class="ss-brand-icon">
+                            🛍️
+                        </span>
+
+                        <span class="ss-brand-text">
+
+                            <span class="ss-brand-name">
+                                Shop<span>Sphere</span>
+                            </span>
+
+                            <span class="ss-brand-tagline">
+                                Shop More, Live Better
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                    <!-- =================================================
+                         SEARCH
+                         ================================================= -->
+
+                    <div class="ss-search-wrapper">
+
+                        <div class="ss-search-box">
+
+
+                            <!-- CATEGORY BUTTON -->
+
+                            <div class="ss-category-dropdown">
+
+                                <button type="button"
+                                        class="ss-search-category"
+                                        id="ssCategoryButton"
+                                        aria-expanded="false">
+
+                                    <span>All Categories</span>
+
+                                    <span class="ss-category-arrow">
+                                        ▼
+                                    </span>
+
+                                </button>
+
+
+                                <!-- CATEGORY MENU -->
+
+                                <div class="ss-category-menu"
+                                     id="ssCategoryMenu">
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        🛍️
+                                        <span>All Products</span>
+
+                                    </a>
+
+                                    <div class="ss-category-line"></div>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        📱
+                                        <span>Electronics</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        👕
+                                        <span>Fashion</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        🏠
+                                        <span>Home &amp; Living</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        🛒
+                                        <span>Groceries</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        🎮
+                                        <span>Gaming</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        📚
+                                        <span>Books &amp; Stationery</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        💄
+                                        <span>Beauty &amp; Personal Care</span>
+
+                                    </a>
+
+                                    <a class="ss-category-item"
+                                       asp-area="Customer"
+                                       asp-controller="Products"
+                                       asp-action="Index">
+
+                                        🚗
+                                        <span>Automotive</span>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="ss-search-divider"></div>
+
+
+                            <!-- SEARCH INPUT -->
+
+                            <form class="ss-search-form"
+                                  asp-area="Customer"
+                                  asp-controller="Products"
+                                  asp-action="Index"
+                                  method="get">
+
+                                <input type="text"
+                                       name="search"
+                                       class="ss-search-input"
+                                       placeholder="Search for products, brands and more..."
+                                       autocomplete="off" />
+
+                                <button type="submit"
+                                        class="ss-search-button"
+                                        title="Search Products">
+
+                                    🔍
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         HEADER ACTIONS
+                         ================================================= -->
+
+                    <div class="ss-header-actions">
+
+
+                        <!-- WISHLIST -->
+                        @if (isCustomer && !isAdmin)
+                        {
+
+                            <a class="ss-header-action"
+                               asp-area="Customer"
+                               asp-controller="Wishlist"
+                               asp-action="Index">
+
+                                <span class="ss-action-icon">
+                                    ♡
+                                </span>
+
+                                <span class="ss-action-label">
+                                    Wishlist
+                                </span>
+
+                                @if (wishlistCount > 0)
+                                {
+                                    <span class="ss-action-badge">
+                                        @wishlistCount
+                                    </span>
+                                }
+
+                            </a>
+
+                        }
+
+
+                        <!-- CART -->
+                        @if (isCustomer && !isAdmin)
+                        {
+
+                            <a class="ss-header-action"
+                               asp-area="Customer"
+                               asp-controller="Cart"
+                               asp-action="Index">
+
+                                <span class="ss-action-icon">
+                                    🛒
+                                </span>
+
+                                <span class="ss-action-label">
+                                    Cart
+                                </span>
+
+                            </a>
+
+                        }
+
+
+                        <!-- USER -->
+                        @if (isAuthenticated)
+                        {
+
+                            <div class="ss-user-area">
+
+                                <button type="button"
+                                        class="ss-user-button"
+                                        id="ssUserButton"
+                                        aria-expanded="false">
+
+                                    <span class="ss-user-avatar">
+                                        👤
+                                    </span>
+
+                                    <span class="ss-user-info">
+
+                                        <span class="ss-user-name">
+
+                                            @(currentUser?.FullName
+                                                ?? User.Identity?.Name)
+
+                                        </span>
+
+                                        <span class="ss-user-type">
+
+                                            @if (isAdmin)
+                                            {
+                                                <text>Administrator</text>
+                                            }
+                                            else if (isApprovedVendor)
+                                            {
+                                                <text>Vendor</text>
+                                            }
+                                            else
+                                            {
+                                                <text>Customer</text>
+                                            }
+
+                                        </span>
+
+                                    </span>
+
+                                    <span class="ss-user-arrow">
+                                        ▼
+                                    </span>
+
+                                </button>
+
+
+                                <!-- USER MENU -->
+
+                                <div class="ss-user-menu"
+                                     id="ssUserMenu">
+
+
+                                    @if (isCustomer && !isAdmin)
+                                    {
+
+                                        <!-- PROFILE -->
+
+                                        <a class="ss-user-menu-item"
+                                           asp-area="Customer"
+                                           asp-controller="CustomerProfile"
+                                           asp-action="Index">
+
+                                            👤
+                                            <span>My Profile</span>
+
+                                        </a>
+
+
+                                        <!-- ORDERS -->
+
+                                        <a class="ss-user-menu-item"
+                                           asp-area="Customer"
+                                           asp-controller="Orders"
+                                           asp-action="Index">
+
+                                            📦
+                                            <span>My Orders</span>
+
+                                        </a>
+
+
+                                        <!-- WISHLIST -->
+
+                                        <a class="ss-user-menu-item"
+                                           asp-area="Customer"
+                                           asp-controller="Wishlist"
+                                           asp-action="Index">
+
+                                            ❤️
+                                            <span>Wishlist</span>
+
+                                            @if (wishlistCount > 0)
+                                            {
+                                                <span class="ss-menu-badge">
+                                                    @wishlistCount
+                                                </span>
+                                            }
+
+                                        </a>
+
+
+                                        <div class="ss-menu-divider"></div>
+
+
+                                        <!-- CUSTOMER / SELLER -->
+                                        @if (!isApprovedVendor)
+                                        {
+
+                                            <a class="ss-user-menu-item"
+                                               asp-area="Customer"
+                                               asp-controller="Vendor"
+                                               asp-action="Register">
+
+                                                🏪
+                                                <span>Sell on ShopSphere</span>
+
+                                            </a>
+
+                                        }
+
+
+                                        <!-- APPROVED VENDOR -->
+                                        @if (isApprovedVendor)
+                                        {
+
+                                            <a class="ss-user-menu-item"
+                                               asp-area="Vendor"
+                                               asp-controller="Dashboard"
+                                               asp-action="Index">
+
+                                                📊
+                                                <span>Vendor Dashboard</span>
+
+                                            </a>
+
+
+                                            <a class="ss-user-menu-item"
+                                               asp-area="Vendor"
+                                               asp-controller="Products"
+                                               asp-action="Index">
+
+                                                📦
+                                                <span>My Products</span>
+
+                                            </a>
+
+
+                                            <a class="ss-user-menu-item"
+                                               asp-area="Vendor"
+                                               asp-controller="Orders"
+                                               asp-action="Index">
+
+                                                🛒
+                                                <span>Vendor Orders</span>
+
+                                            </a>
+
+
+                                            <a class="ss-user-menu-item"
+                                               asp-area="Vendor"
+                                               asp-controller="Earnings"
+                                               asp-action="Index">
+
+                                                💰
+                                                <span>Earnings</span>
+
+                                            </a>
+
+                                        }
+
+
+                                        <div class="ss-menu-divider"></div>
+
+                                    }
+
+
+                                    <!-- ADMIN -->
+                                    @if (isAdmin)
+                                    {
+
+                                        <a class="ss-user-menu-item"
+                                           asp-area="Admin"
+                                           asp-controller="Dashboard"
+                                           asp-action="Index">
+
+                                            👑
+                                            <span>Admin Dashboard</span>
+
+                                        </a>
+
+
+                                        <div class="ss-menu-divider"></div>
+
+                                    }
+
+
+                                    <!-- LOGOUT -->
+
+                                    <form asp-area=""
+                                          asp-controller="Account"
+                                          asp-action="Logout"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="ss-user-menu-item ss-logout-item">
+
+                                            🚪
+                                            <span>Logout</span>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        }
+                        else
+                        {
+
+                            <!-- LOGIN -->
+
+                            <a class="ss-login-link"
+                               asp-area=""
+                               asp-controller="Account"
+                               asp-action="Login">
+
+                                🔐 Login
+
+                            </a>
+
+
+                            <!-- REGISTER -->
+
+                            <a class="ss-register-button"
+                               asp-area=""
+                               asp-controller="Account"
+                               asp-action="Register">
+
+                                ✨ Register
+
+                            </a>
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+
+        <!-- =====================================================
+             NAVIGATION
+             ===================================================== -->
+
+        <nav class="ss-navigation">
+
+            <div class="container">
+
+                <div class="ss-navigation-inner">
+
+
+                    <!-- MOBILE BUTTON -->
+
+                    <button class="ss-mobile-toggle"
+                            type="button"
+                            id="ssMobileToggle"
+                            aria-expanded="false">
+
+                        ☰
+                        <span>Menu</span>
+
+                    </button>
+
+
+                    <!-- NAVIGATION -->
+
+                    <div class="ss-navigation-collapse"
+                         id="ssMainNavigation">
+
+                        <ul class="ss-navigation-list">
+
+
+                            <!-- HOME -->
+
+                            <li>
+
+                                <a class="ss-navigation-link ss-active"
+                                   asp-area="Customer"
+                                   asp-controller="Home"
+                                   asp-action="Index">
+
+                                    🏠
+                                    <span>Home</span>
+
+                                </a>
+
+                            </li>
+
+
+                            <!-- SHOP -->
+
+                            <li>
+
+                                <a class="ss-navigation-link"
+                                   asp-area="Customer"
+                                   asp-controller="Products"
+                                   asp-action="Index">
+
+                                    🛍️
+                                    <span>Shop</span>
+
+                                </a>
+
+                            </li>
+
+
+
+
+                           
+
+                            <!-- CUSTOMER SELLER -->
+                            @if (isCustomer &&
+                                                             !isAdmin &&
+                                                             !isApprovedVendor)
+                            {
+
+                                <li>
+
+                                    <a class="ss-navigation-link"
+                                       asp-area="Customer"
+                                       asp-controller="Vendor"
+                                       asp-action="Register">
+
+                                        🏪
+                                        <span>Become a Seller</span>
+
+                                    </a>
+
+                                    
+
+                                </li>
+
+                            }
+
+
+                            <!-- APPROVED VENDOR -->
+                            @if (isApprovedVendor)
+                            {
+
+                                <li class="ss-nav-divider"></li>
+
+                                <li>
+
+                                    <a class="ss-navigation-link ss-vendor-link"
+                                       asp-area="Vendor"
+                                       asp-controller="Dashboard"
+                                       asp-action="Index">
+
+                                        📊
+                                        <span>Vendor Dashboard</span>
+
+                                    </a>
+
+                                </li>
+
+                            }
+
+
+                            <!-- ADMIN -->
+                            @if (isAdmin)
+                            {
+
+                                <li class="ss-nav-divider"></li>
+
+                                <li>
+
+                                    <a class="ss-navigation-link ss-admin-link"
+                                       asp-area="Admin"
+                                       asp-controller="Dashboard"
+                                       asp-action="Index">
+
+                                        👑
+                                        <span>Admin</span>
+
+                                    </a>
+
+                                </li>
+
+                            }
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main role="main">
+
+        @RenderBody()
+
+    </main>
+
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
+    <footer class="ss-footer border-top mt-5">
+
+        <div class="container">
+
+            <div class="row py-5">
+
+
+                <!-- BRAND -->
+
+                <div class="col-md-4 mb-4">
+
+                    <div class="ss-footer-brand">
+
+                        🛍️
+                        <strong>ShopSphere</strong>
+
+                    </div>
+
+                    <p class="text-muted mb-0 mt-2">
+
+                        Smart Multi-Vendor E-Commerce Platform
+
+                    </p>
+
+                </div>
+
+
+                <!-- QUICK LINKS -->
+
+                <div class="col-md-4 mb-4">
+
+                    <h6 class="fw-bold">
+                        Quick Links
+                    </h6>
+
+                    <ul class="list-unstyled mt-3">
+
+                        <li class="mb-2">
+
+                            <a class="text-decoration-none"
+                               asp-area="Customer"
+                               asp-controller="Home"
+                               asp-action="Index">
+
+                                Home
+
+                            </a>
+
+                        </li>
+
+                        <li class="mb-2">
+
+                            <a class="text-decoration-none"
+                               asp-area="Customer"
+                               asp-controller="Products"
+                               asp-action="Index">
+
+                                Shop
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ACCOUNT -->
+
+                <div class="col-md-4 mb-4">
+
+                    <h6 class="fw-bold">
+                        Account
+                    </h6>
+
+                    <div class="mt-3">
+
+                        @if (isAuthenticated)
+                        {
+
+                            <a class="d-block text-decoration-none mb-2"
+                               asp-area="Customer"
+                               asp-controller="CustomerProfile"
+                               asp-action="Index">
+
+                                👤 My Profile
+
+                            </a>
+
+
+                            <a class="d-block text-decoration-none mb-2"
+                               asp-area="Customer"
+                               asp-controller="Orders"
+                               asp-action="Index">
+
+                                📦 My Orders
+
+                            </a>
+
+
+                            <a class="d-block text-decoration-none mb-2"
+                               asp-area="Customer"
+                               asp-controller="Wishlist"
+                               asp-action="Index">
+
+                                ❤️ My Wishlist
+
+                                @if (wishlistCount > 0)
+                                {
+                                    <span class="badge bg-danger rounded-pill ms-1">
+                                        @wishlistCount
+                                    </span>
+                                }
+
+                            </a>
+
+
+                            <a class="d-block text-decoration-none"
+                               asp-area="Customer"
+                               asp-controller="Cart"
+                               asp-action="Index">
+
+                                🛒 My Cart
+
+                            </a>
+
+                        }
+                        else
+                        {
+
+                            <a class="d-block text-decoration-none mb-2"
+                               asp-area=""
+                               asp-controller="Account"
+                               asp-action="Login">
+
+                                Login
+
+                            </a>
+
+
+                            <a class="d-block text-decoration-none"
+                               asp-area=""
+                               asp-controller="Account"
+                               asp-action="Register">
+
+                                Create Account
+
+                            </a>
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <hr />
+
+
+            <div class="text-center text-muted small py-3">
+
+                &copy; @DateTime.Now.Year -
+                ShopSphere. All rights reserved.
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =========================================================
+         SCRIPTS
+         ========================================================= -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true">
+    </script>
+
+
+    <!-- =========================================================
+         SHOPSPHERE HEADER JAVASCRIPT
+         ========================================================= -->
+
+    <script>
+
+            document.addEventListener("DOMContentLoaded", function() {
+
+                /* =====================================================
+                   CATEGORY DROPDOWN
+                   ===================================================== */
+
+                const categoryDropdown =
+                    document.querySelector(".ss-category-dropdown");
+
+                const categoryButton =
+                    document.getElementById("ssCategoryButton");
+
+                if (categoryDropdown && categoryButton) {
+
+                    categoryButton.addEventListener("click", function(event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        const isOpen =
+                            categoryDropdown.classList.toggle("open");
+
+                        categoryButton.setAttribute(
+                            "aria-expanded",
+                            isOpen ? "true" : "false"
+                        );
+
+                    });
+
+                }
+
+
+                /* =====================================================
+                   USER DROPDOWN
+                   ===================================================== */
+
+                const userArea =
+                    document.querySelector(".ss-user-area");
+
+                const userButton =
+                    document.getElementById("ssUserButton");
+
+                if (userArea && userButton) {
+
+                    userButton.addEventListener("click", function(event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        const isOpen =
+                            userArea.classList.toggle("open");
+
+                        userButton.setAttribute(
+                            "aria-expanded",
+                            isOpen ? "true" : "false"
+                        );
+
+                    });
+
+                }
+
+
+                /* =====================================================
+                   CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
+                   ===================================================== */
+
+                document.addEventListener("click", function(event) {
+
+                    if (
+                        categoryDropdown &&
+                        !categoryDropdown.contains(event.target)
+                    ) {
+
+                        categoryDropdown.classList.remove("open");
+
+                        if (categoryButton) {
+
+                            categoryButton.setAttribute(
+                                "aria-expanded",
+                                "false"
+                            );
+
+                        }
+
+                    }
+
+
+                    if (
+                        userArea &&
+                        !userArea.contains(event.target)
+                    ) {
+
+                        userArea.classList.remove("open");
+
+                        if (userButton) {
+
+                            userButton.setAttribute(
+                                "aria-expanded",
+                                "false"
+                            );
+
+                        }
+
+                    }
+
+                });
+
+
+                /* =====================================================
+                   MOBILE NAVIGATION
+                   ===================================================== */
+
+                const mobileToggle =
+                    document.getElementById("ssMobileToggle");
+
+                const mobileNavigation =
+                    document.getElementById("ssMainNavigation");
+
+                if (mobileToggle && mobileNavigation) {
+
+                    mobileToggle.addEventListener(
+                        "click",
+                        function() {
+
+                            const isOpen =
+                                mobileNavigation.classList.toggle(
+                                    "ss-mobile-open"
+                                );
+
+                            mobileToggle.setAttribute(
+                                "aria-expanded",
+                                isOpen ? "true" : "false"
+                            );
+
+                        }
+                    );
+
+                }
+
+            });
+
+    </script>
+
+
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
+
+</body>
+
+</html>

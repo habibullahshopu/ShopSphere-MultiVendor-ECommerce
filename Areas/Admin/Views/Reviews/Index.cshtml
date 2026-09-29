@@ -1,0 +1,726 @@
+﻿@model IEnumerable<ShopSphere.Models.ProductReview>
+
+@{
+    ViewData["Title"] = "Manage Reviews";
+
+    var totalReviews = ViewBag.TotalReviews is int total
+        ? total
+        : 0;
+
+    var approvedReviews = ViewBag.ApprovedReviews is int approved
+        ? approved
+        : 0;
+
+    var pendingReviews = ViewBag.PendingReviews is int pending
+        ? pending
+        : 0;
+
+    var averageRating = ViewBag.AverageRating is double avg
+        ? avg
+        : Convert.ToDouble(ViewBag.AverageRating ?? 0);
+
+    var currentSearch = ViewBag.Search as string;
+    var currentStatus = ViewBag.Status as string;
+
+    int? currentRating = ViewBag.Rating as int?;
+
+    string GetStars(int rating)
+    {
+        rating = Math.Max(0, Math.Min(5, rating));
+
+        return new string('★', rating) +
+               new string('☆', 5 - rating);
+    }
+}
+
+<style>
+    .review-page-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #fff;
+        border-radius: 20px;
+        padding: 28px;
+    }
+
+    .stat-card {
+        border: 0;
+        border-radius: 18px;
+        transition: .2s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+    .review-table-card {
+        border: 0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .review-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #0d6efd;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .review-stars {
+        color: #ffc107;
+        letter-spacing: 1px;
+        white-space: nowrap;
+    }
+
+    .review-comment {
+        max-width: 330px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .filter-card {
+        border: 0;
+        border-radius: 18px;
+    }
+
+    .status-badge {
+        min-width: 85px;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="review-page-header shadow-sm mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+                <h1 class="fw-bold mb-2">
+                    ⭐ Manage Product Reviews
+                </h1>
+
+                <p class="mb-0 opacity-75">
+                    Review, approve, reject and manage customer feedback.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Dashboard"
+               asp-action="Index"
+               class="btn btn-light">
+                ← Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ALERTS -->
+    <!-- ========================================================= -->
+    @if (TempData["ReviewSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            ✅ @TempData["ReviewSuccess"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["ReviewError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            ⚠️ @TempData["ReviewError"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- STATISTICS -->
+    <!-- ========================================================= -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Total -->
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small">
+                                Total Reviews
+                            </div>
+
+                            <div class="fs-2 fw-bold">
+                                @totalReviews
+                            </div>
+                        </div>
+
+                        <div class="fs-1">
+                            ⭐
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Approved -->
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small">
+                                Approved
+                            </div>
+
+                            <div class="fs-2 fw-bold text-success">
+                                @approvedReviews
+                            </div>
+                        </div>
+
+                        <div class="fs-1">
+                            ✅
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Pending -->
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small">
+                                Pending / Hidden
+                            </div>
+
+                            <div class="fs-2 fw-bold text-warning">
+                                @pendingReviews
+                            </div>
+                        </div>
+
+                        <div class="fs-1">
+                            ⏳
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Average -->
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <div class="text-muted small">
+                                Average Rating
+                            </div>
+
+                            <div class="fs-2 fw-bold">
+                                @averageRating.ToString("0.0")
+                            </div>
+                        </div>
+
+                        <div class="fs-1">
+                            ⭐
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- FILTERS -->
+    <!-- ========================================================= -->
+
+    <div class="card filter-card shadow-sm mb-4">
+
+        <div class="card-body p-4">
+
+            <form asp-area="Admin"
+                  asp-controller="Reviews"
+                  asp-action="Index"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- Search -->
+                    <div class="col-lg-5">
+
+                        <label class="form-label fw-semibold">
+                            Search
+                        </label>
+
+                        <input type="text"
+                               name="search"
+                               value="@currentSearch"
+                               class="form-control"
+                               placeholder="Search product, customer or email..." />
+
+                    </div>
+
+
+                    <!-- Rating -->
+                    <div class="col-sm-6 col-lg-2">
+
+                        <label class="form-label fw-semibold">
+                            Rating
+                        </label>
+
+                        <select name="rating"
+                                class="form-select">
+
+                            <option value="">
+                                All Ratings
+                            </option>
+
+                            <option value="5"
+                                    selected="@(currentRating == 5)">
+                                ⭐⭐⭐⭐⭐
+                            </option>
+
+                            <option value="4"
+                                    selected="@(currentRating == 4)">
+                                ⭐⭐⭐⭐
+                            </option>
+
+                            <option value="3"
+                                    selected="@(currentRating == 3)">
+                                ⭐⭐⭐
+                            </option>
+
+                            <option value="2"
+                                    selected="@(currentRating == 2)">
+                                ⭐⭐
+                            </option>
+
+                            <option value="1"
+                                    selected="@(currentRating == 1)">
+                                ⭐
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="col-sm-6 col-lg-2">
+
+                        <label class="form-label fw-semibold">
+                            Status
+                        </label>
+
+                        <select name="status"
+                                class="form-select">
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="Approved"
+                                    selected="@(string.Equals(currentStatus, "Approved", StringComparison.OrdinalIgnoreCase))">
+                                Approved
+                            </option>
+
+                            <option value="Pending"
+                                    selected="@(string.Equals(currentStatus, "Pending", StringComparison.OrdinalIgnoreCase))">
+                                Pending / Hidden
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Filter -->
+                    <div class="col-lg-3 d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary flex-grow-1">
+                            🔍 Filter
+                        </button>
+
+                        <a asp-area="Admin"
+                           asp-controller="Reviews"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            Reset
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- REVIEW TABLE -->
+    <!-- ========================================================= -->
+
+    <div class="card review-table-card shadow-sm">
+
+        <div class="card-header bg-white border-0 p-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        Customer Reviews
+                    </h4>
+
+                    <div class="text-muted small">
+                        @Model.Count() review(s) found
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="px-4">
+                                Customer
+                            </th>
+
+                            <th>
+                                Product
+                            </th>
+
+                            <th>
+                                Rating
+                            </th>
+
+                            <th>
+                                Review
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th class="text-end px-4">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var review in Model)
+                        {
+                            var customerName =
+                                !string.IsNullOrWhiteSpace(review.User?.FullName)
+                                    ? review.User.FullName
+                                    : "Customer";
+
+                            var initial =
+                                customerName.Substring(0, 1).ToUpper();
+
+                            <tr>
+
+                                <!-- Customer -->
+                                <td class="px-4">
+
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <div class="review-avatar">
+                                            @initial
+                                        </div>
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                @customerName
+                                            </div>
+
+                                            <div class="small text-muted">
+                                                @(review.User?.Email ?? "No email")
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Product -->
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @(review.Product?.Name ?? "Unknown Product")
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Rating -->
+                                <td>
+
+                                    <div class="review-stars">
+                                        @GetStars(review.Rating)
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        @review.Rating / 5
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Review -->
+                                <td>
+
+                                    <div class="review-comment"
+                                         title="@review.Comment">
+                                        @review.Comment
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Date -->
+                                <td>
+
+                                    <div>
+                                        @review.CreatedAt
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy")
+                                    </div>
+
+                                    @if (review.UpdatedAt.HasValue)
+                                    {
+                                        <div class="small text-muted">
+                                            Edited
+                                        </div>
+                                    }
+
+                                </td>
+
+
+                                <!-- Status -->
+                                <td>
+
+                                    @if (review.IsApproved)
+                                    {
+                                        <span class="badge bg-success status-badge">
+                                            Approved
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark status-badge">
+                                            Pending / Hidden
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Actions -->
+                                <td class="text-end px-4">
+
+                                    <div class="d-flex justify-content-end gap-1 flex-wrap">
+
+                                        <!-- Details -->
+                                        <a asp-area="Admin"
+                                           asp-controller="Reviews"
+                                           asp-action="Details"
+                                           asp-route-id="@review.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            View
+                                        </a>
+
+
+                                        <!-- Approve -->
+                                        @if (!review.IsApproved)
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="Reviews"
+                                                  asp-action="Approve"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@review.Id" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-success">
+                                                    Approve
+                                                </button>
+
+                                            </form>
+                                        }
+
+
+                                        <!-- Reject -->
+                                        @if (review.IsApproved)
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="Reviews"
+                                                  asp-action="Reject"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@review.Id" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-warning">
+                                                    Hide
+                                                </button>
+
+                                            </form>
+                                        }
+
+
+                                        <!-- Delete -->
+                                        <form asp-area="Admin"
+                                              asp-controller="Reviews"
+                                              asp-action="Delete"
+                                              method="post"
+                                              onsubmit="return confirm('Are you sure you want to permanently delete this review?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@review.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+
+            <div class="p-5 text-center">
+
+                <div style="font-size:60px;">
+                    ⭐
+                </div>
+
+                <h4 class="fw-bold mt-3">
+                    No Reviews Found
+                </h4>
+
+                <p class="text-muted mb-0">
+                    No reviews match your current filters.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>

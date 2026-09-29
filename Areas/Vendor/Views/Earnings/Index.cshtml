@@ -1,0 +1,285 @@
+﻿@model ShopSphere.ViewModels.VendorEarningsHistoryViewModel
+
+@{
+    ViewData["Title"] = "Earnings";
+}
+
+<div class="container py-5">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Earnings 💰
+            </h2>
+
+            <p class="text-muted mb-0">
+                Track your sales, commission and net earnings.
+            </p>
+        </div>
+
+        <a asp-area="Vendor"
+           asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-outline-primary mt-2 mt-md-0">
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+
+        <!-- Total Sales -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-2 mb-3">
+                        💰
+                    </div>
+
+                    <div class="text-muted small">
+                        Total Sales
+                    </div>
+
+                    <h3 class="fw-bold mt-1 mb-0">
+                        ৳@Model.TotalSales.ToString("N2")
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Total Commission -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-2 mb-3">
+                        💸
+                    </div>
+
+                    <div class="text-muted small">
+                        Platform Commission
+                    </div>
+
+                    <h3 class="fw-bold text-danger mt-1 mb-0">
+                        ৳@Model.TotalCommission.ToString("N2")
+                    </h3>
+
+                    <span class="badge bg-info text-dark mt-2">
+                        @Model.CommissionRate.ToString("0.00")%
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Net Earnings -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-2 mb-3">
+                        📈
+                    </div>
+
+                    <div class="text-muted small">
+                        Net Earnings
+                    </div>
+
+                    <h3 class="fw-bold text-success mt-1 mb-0">
+                        ৳@Model.NetEarnings.ToString("N2")
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Orders -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-2 mb-3">
+                        📦
+                    </div>
+
+                    <div class="text-muted small">
+                        Paid Orders
+                    </div>
+
+                    <h3 class="fw-bold mt-1 mb-0">
+                        @Model.TotalOrders
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Earnings History -->
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-header bg-primary text-white rounded-top-4 p-4">
+
+            <h5 class="fw-bold mb-1">
+                Earnings History
+            </h5>
+
+            <p class="mb-0 opacity-75">
+                Earnings generated from your paid product sales.
+            </p>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            @if (Model.Earnings.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th class="px-4">
+                                    Order
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Product
+                                </th>
+
+                                <th class="text-center">
+                                    Qty
+                                </th>
+
+                                <th class="text-end">
+                                    Sales
+                                </th>
+
+                                <th class="text-end">
+                                    Commission
+                                </th>
+
+                                <th class="text-end px-4">
+                                    Net Earnings
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var item in Model.Earnings)
+                            {
+                                <tr>
+
+                                    <td class="px-4 fw-semibold">
+                                        #@item.OrderId
+                                    </td>
+
+                                    <td>
+                                        @item.OrderDate.ToLocalTime().ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @item.ProductName
+                                        </div>
+
+                                        <small class="text-muted">
+                                            ৳@item.UnitPrice.ToString("N2") each
+                                        </small>
+                                    </td>
+
+                                    <td class="text-center">
+                                        @item.Quantity
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        ৳@item.Subtotal.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end text-danger">
+                                        - ৳@item.CommissionAmount.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end px-4 fw-bold text-success">
+                                        ৳@item.NetEarnings.ToString("N2")
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+
+                    <div class="display-4 mb-3">
+                        💰
+                    </div>
+
+                    <h5 class="fw-bold">
+                        No Earnings Yet
+                    </h5>
+
+                    <p class="text-muted mb-4">
+                        Your paid product sales will appear here.
+                    </p>
+
+                    <a asp-area="Vendor"
+                       asp-controller="Products"
+                       asp-action="Index"
+                       class="btn btn-primary px-4">
+                        📦 Manage Products
+                    </a>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

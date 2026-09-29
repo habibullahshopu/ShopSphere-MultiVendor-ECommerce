@@ -1,0 +1,191 @@
+﻿@model IEnumerable<ShopSphere.Models.Order>
+@using ShopSphere.Helpers
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+        <div>
+            <h1 class="fw-bold mb-2">
+                My Orders 📦
+            </h1>
+
+            <p class="text-muted mb-0">
+                View and track your ShopSphere orders.
+            </p>
+        </div>
+
+        <a asp-area="Customer"
+           asp-controller="Products"
+           asp-action="Index"
+           class="btn btn-outline-primary">
+            🛍️ Continue Shopping
+        </a>
+
+    </div>
+
+
+    @if (Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-4">
+
+                @foreach (var order in Model)
+                {
+                    <div class="border rounded-4 p-4 mb-3">
+
+                        <div class="row align-items-center g-3">
+
+                            <div class="col-lg-3">
+
+                                <div class="fw-bold">
+                                    Order #@order.Id
+                                </div>
+
+                                <small class="text-muted">
+                                    @BangladeshTimeHelper.ToBangladeshTime(order.CreatedAt).ToString("dd MMM yyyy, hh:mm tt")
+                                </small>
+
+                            </div>
+
+
+                            <div class="col-lg-2">
+
+                                <small class="text-muted d-block">
+                                    Items
+                                </small>
+
+                                <span class="fw-semibold">
+                                    @order.OrderItems.Sum(i => i.Quantity)
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-lg-2">
+
+                                <small class="text-muted d-block">
+                                    Total
+                                </small>
+
+                                <span class="fw-bold text-primary">
+                                    ৳ @order.TotalAmount.ToString("N2")
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-lg-2">
+
+                                <small class="text-muted d-block">
+                                    Order Status
+                                </small>
+
+                                @if (order.Status == "Delivered")
+                                {
+                                    <span class="badge bg-success">
+                                        @order.Status
+                                    </span>
+                                }
+                                else if (order.Status == "Cancelled")
+                                {
+                                    <span class="badge bg-danger">
+                                        @order.Status
+                                    </span>
+                                }
+                                else if (order.Status == "Shipped")
+                                {
+                                    <span class="badge bg-info text-dark">
+                                        @order.Status
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        @order.Status
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <div class="col-lg-1">
+
+                                <small class="text-muted d-block">
+                                    Payment
+                                </small>
+
+                                @if (order.PaymentStatus == "Paid")
+                                {
+                                    <span class="badge bg-success">
+                                        Paid
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @order.PaymentStatus
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <div class="col-lg-2 text-lg-end">
+
+                                <a asp-area="Customer"
+                                   asp-controller="Orders"
+                                   asp-action="Details"
+                                   asp-route-id="@order.Id"
+                                   class="btn btn-sm btn-outline-primary">
+
+                                    View Details →
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body text-center py-5">
+
+                <div style="font-size: 75px;">
+                    📦
+                </div>
+
+                <h2 class="fw-bold mt-3">
+                    No Orders Yet
+                </h2>
+
+                <p class="text-muted">
+                    You haven't placed any orders yet.
+                </p>
+
+                <a asp-area="Customer"
+                   asp-controller="Products"
+                   asp-action="Index"
+                   class="btn btn-primary px-4">
+                    Start Shopping
+                </a>
+
+            </div>
+
+        </div>
+    }
+
+</div>

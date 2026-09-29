@@ -1,0 +1,657 @@
+﻿@model IEnumerable<ShopSphere.Models.Coupon>
+
+@{
+    ViewData["Title"] = "Coupons";
+
+    var search = ViewBag.Search as string;
+    var discountType = ViewBag.DiscountType as string;
+    var status = ViewBag.Status as string;
+}
+
+<style>
+    .coupon-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        border-radius: 20px;
+        padding: 28px;
+    }
+
+    .stat-card {
+        border: 0;
+        border-radius: 16px;
+        transition: .2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .coupon-table-card {
+        border: 0;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .coupon-code {
+        font-weight: 700;
+        letter-spacing: .7px;
+        color: #0d6efd;
+    }
+
+    .discount-badge {
+        font-size: .85rem;
+        font-weight: 700;
+    }
+
+    .table th {
+        white-space: nowrap;
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #64748b;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .filter-card {
+        border: 0;
+        border-radius: 16px;
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="coupon-header shadow-sm mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between
+            align-items-center gap-3">
+
+            <div>
+                <h1 class="fw-bold mb-2">
+                    🎟️ Coupon Management
+                </h1>
+
+                <p class="mb-0 opacity-75">
+                    Create and manage customer discount coupons.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Coupons"
+               asp-action="Create"
+               class="btn btn-light fw-semibold">
+
+                ➕ Create Coupon
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ALERT -->
+    @if (TempData["CouponSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            ✅ @TempData["CouponSuccess"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- STATISTICS -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small fw-semibold">
+                        TOTAL COUPONS
+                    </div>
+
+                    <div class="fs-2 fw-bold text-primary mt-2">
+                        @ViewBag.TotalCoupons
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small fw-semibold">
+                        ACTIVE
+                    </div>
+
+                    <div class="fs-2 fw-bold text-success mt-2">
+                        @ViewBag.ActiveCoupons
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small fw-semibold">
+                        INACTIVE
+                    </div>
+
+                    <div class="fs-2 fw-bold text-secondary mt-2">
+                        @ViewBag.InactiveCoupons
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6 col-xl-3">
+
+            <div class="card stat-card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="text-muted small fw-semibold">
+                        EXPIRED
+                    </div>
+
+                    <div class="fs-2 fw-bold text-danger mt-2">
+                        @ViewBag.ExpiredCoupons
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTERS -->
+    <div class="card filter-card shadow-sm mb-4">
+
+        <div class="card-body p-4">
+
+            <form asp-area="Admin"
+                  asp-controller="Coupons"
+                  asp-action="Index"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-lg-5">
+
+                        <label class="form-label fw-semibold">
+                            Search
+                        </label>
+
+                        <input type="text"
+                               name="search"
+                               value="@search"
+                               class="form-control"
+                               placeholder="Search coupon code or description..." />
+
+                    </div>
+
+
+                    <div class="col-md-4 col-lg-3">
+
+                        <label class="form-label fw-semibold">
+                            Discount Type
+                        </label>
+
+                        <select name="discountType"
+                                class="form-select">
+
+                            <option value="All"
+                                    selected="@(discountType == "All" || string.IsNullOrEmpty(discountType))">
+                                All Types
+                            </option>
+
+                            <option value="Percentage"
+                                    selected="@(discountType == "Percentage")">
+                                Percentage
+                            </option>
+
+                            <option value="Fixed"
+                                    selected="@(discountType == "Fixed")">
+                                Fixed Amount
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4 col-lg-2">
+
+                        <label class="form-label fw-semibold">
+                            Status
+                        </label>
+
+                        <select name="status"
+                                class="form-select">
+
+                            <option value="All"
+                                    selected="@(status == "All" || string.IsNullOrEmpty(status))">
+                                All
+                            </option>
+
+                            <option value="Active"
+                                    selected="@(status == "Active")">
+                                Active
+                            </option>
+
+                            <option value="Inactive"
+                                    selected="@(status == "Inactive")">
+                                Inactive
+                            </option>
+
+                            <option value="Expired"
+                                    selected="@(status == "Expired")">
+                                Expired
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4 col-lg-2">
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+
+                                🔎 Filter
+
+                            </button>
+
+                            <a asp-area="Admin"
+                               asp-controller="Coupons"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary">
+
+                                ↻
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- COUPON TABLE -->
+    <div class="card coupon-table-card shadow-sm">
+
+        <div class="card-body p-0">
+
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th class="ps-4">
+                                    Coupon
+                                </th>
+
+                                <th>
+                                    Discount
+                                </th>
+
+                                <th>
+                                    Minimum Order
+                                </th>
+
+                                <th>
+                                    Validity
+                                </th>
+
+                                <th>
+                                    Usage
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th class="text-end pe-4">
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var coupon in Model)
+                            {
+                                var isExpired =
+                                    coupon.ExpiryDate.HasValue &&
+                                    coupon.ExpiryDate.Value < DateTime.UtcNow;
+
+                                var isUsageLimitReached =
+                                    coupon.UsageLimit.HasValue &&
+                                    coupon.UsedCount >= coupon.UsageLimit.Value;
+
+                                <tr>
+
+                                    <!-- COUPON -->
+                                    <td class="ps-4">
+
+                                        <div class="coupon-code">
+                                            @coupon.Code
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(coupon.Description))
+                                        {
+                                            <div class="small text-muted mt-1">
+                                                @coupon.Description
+                                            </div>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- DISCOUNT -->
+                                    <td>
+
+                                        @if (coupon.DiscountType == "Percentage")
+                                        {
+                                            <span class="badge bg-primary discount-badge">
+                                                @coupon.DiscountValue.ToString("0.##")%
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info text-dark discount-badge">
+                                                ৳@coupon.DiscountValue.ToString("N2")
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- MINIMUM ORDER -->
+                                    <td>
+
+                                        @if (coupon.MinimumOrderAmount > 0)
+                                        {
+                                            <span>
+                                                ৳@coupon.MinimumOrderAmount.ToString("N2")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No minimum
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- VALIDITY -->
+                                    <td>
+
+                                        @if (coupon.StartDate.HasValue)
+                                        {
+                                            <div class="small">
+                                                From:
+                                                @coupon.StartDate.Value
+                                                .ToLocalTime()
+                                                .ToString("dd MMM yyyy")
+                                            </div>
+                                        }
+
+                                        @if (coupon.ExpiryDate.HasValue)
+                                        {
+                                            <div class="small">
+                                                Until:
+                                                @coupon.ExpiryDate.Value
+                                                .ToLocalTime()
+                                                .ToString("dd MMM yyyy")
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="small text-muted">
+                                                No expiry
+                                            </div>
+                                        }
+
+                                        @if (isExpired)
+                                        {
+                                            <span class="badge bg-danger mt-1">
+                                                Expired
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- USAGE -->
+                                    <td>
+
+                                        <div class="small fw-semibold">
+
+                                            @coupon.UsedCount
+
+                                            @if (coupon.UsageLimit.HasValue)
+                                            {
+                                                <span class="text-muted">
+                                                    / @coupon.UsageLimit.Value
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    / Unlimited
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                        @if (isUsageLimitReached)
+                                        {
+                                            <span class="badge bg-warning text-dark mt-1">
+                                                Limit Reached
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- STATUS -->
+                                    <td>
+
+                                        @if (!coupon.IsActive)
+                                        {
+                                            <span class="badge bg-secondary">
+                                                Inactive
+                                            </span>
+                                        }
+                                        else if (isExpired)
+                                        {
+                                            <span class="badge bg-danger">
+                                                Expired
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                Active
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ACTIONS -->
+                                    <td class="text-end pe-4">
+
+                                        <div class="d-flex justify-content-end
+                                            gap-2 flex-wrap">
+
+                                            <a asp-area="Admin"
+                                               asp-controller="Coupons"
+                                               asp-action="Details"
+                                               asp-route-id="@coupon.Id"
+                                               class="btn btn-sm btn-outline-primary">
+
+                                                View
+
+                                            </a>
+
+                                            <a asp-area="Admin"
+                                               asp-controller="Coupons"
+                                               asp-action="Edit"
+                                               asp-route-id="@coupon.Id"
+                                               class="btn btn-sm btn-outline-dark">
+
+                                                Edit
+
+                                            </a>
+
+                                            <form asp-area="Admin"
+                                                  asp-controller="Coupons"
+                                                  asp-action="ToggleStatus"
+                                                  asp-route-id="@coupon.Id"
+                                                  method="post"
+                                                  class="d-inline">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="btn btn-sm @(coupon.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+
+                                                    @(coupon.IsActive
+                                                        ? "Disable"
+                                                        : "Enable")
+
+                                                </button>
+
+                                            </form>
+
+                                            <form asp-area="Admin"
+                                                  asp-controller="Coupons"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@coupon.Id"
+                                                  method="post"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to permanently delete this coupon?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger">
+
+                                                    Delete
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        🎟️
+                    </div>
+
+                    <h4 class="fw-bold">
+                        No Coupons Found
+                    </h4>
+
+                    <p class="text-muted mb-4">
+                        There are no coupons matching your current filters.
+                    </p>
+
+                    <a asp-area="Admin"
+                       asp-controller="Coupons"
+                       asp-action="Create"
+                       class="btn btn-primary">
+
+                        ➕ Create Your First Coupon
+
+                    </a>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

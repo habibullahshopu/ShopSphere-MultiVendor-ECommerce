@@ -1,0 +1,359 @@
+﻿@model ShopSphere.Controllers.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+
+    .login-page {
+        min-height: 78vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 15px;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .login-card {
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 40px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, .10);
+    }
+
+    .login-brand {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-icon {
+        font-size: 48px;
+        margin-bottom: 8px;
+    }
+
+    .login-brand h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .login-brand p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #cbd5e1;
+        border-radius: 11px;
+        outline: none;
+        font-size: 16px;
+        background: white;
+        transition: .2s;
+        box-sizing: border-box;
+    }
+
+        .form-control-custom:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+        }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-input {
+        padding-right: 55px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 20px;
+        padding: 6px;
+        color: #64748b;
+        border-radius: 6px;
+    }
+
+        .password-toggle:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+    .login-options {
+        display: flex;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+    .remember-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #475569;
+        font-size: 14px;
+    }
+
+        .remember-box input {
+            width: 16px;
+            height: 16px;
+        }
+
+    .login-btn {
+        width: 100%;
+        border: none;
+        border-radius: 11px;
+        padding: 14px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, .22);
+        transition: .2s;
+    }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, .30);
+        }
+
+    .register-link {
+        text-align: center;
+        margin-top: 22px;
+        color: #64748b;
+    }
+
+        .register-link a {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .register-link a:hover {
+                text-decoration: underline;
+            }
+
+    .validation-summary {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        border-radius: 10px;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 576px) {
+
+        .login-card {
+            padding: 25px 20px;
+        }
+
+        .login-brand h1 {
+            font-size: 28px;
+        }
+    }
+
+</style>
+
+
+<div class="login-page">
+
+    <div class="login-wrapper">
+
+        <div class="login-card">
+
+            <div class="login-brand">
+
+                <div class="login-icon">
+                    🛍️
+                </div>
+
+                <h1>
+                    Welcome Back
+                </h1>
+
+                <p>
+                    Sign in to continue to ShopSphere.
+                </p>
+
+            </div>
+
+
+            <form asp-controller="Account"
+                  asp-action="Login"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="ReturnUrl" type="hidden" />
+
+
+                <div asp-validation-summary="ModelOnly"
+                     class="validation-summary">
+                </div>
+
+
+                <!-- Email -->
+                <div class="mb-4">
+
+                    <label asp-for="Email"
+                           class="form-label form-label-custom">
+                        Email Address
+                    </label>
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control-custom"
+                           placeholder="you@example.com"
+                           autocomplete="email" />
+
+                    <span asp-validation-for="Email"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="mb-4">
+
+                    <label asp-for="Password"
+                           class="form-label form-label-custom">
+                        Password
+                    </label>
+
+                    <div class="password-wrapper">
+
+                        <input asp-for="Password"
+                               id="loginPassword"
+                               type="password"
+                               class="form-control-custom password-input"
+                               placeholder="Enter your password"
+                               autocomplete="current-password" />
+
+                        <button type="button"
+                                id="loginPasswordToggle"
+                                class="password-toggle"
+                                aria-label="Show password">
+
+                            <span id="loginPasswordIcon">
+                                👁️
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Remember Me -->
+                <div class="login-options">
+
+                    <label class="remember-box">
+
+                        <input asp-for="RememberMe" />
+
+                        <span>
+                            Remember me
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- Login button -->
+                <button type="submit"
+                        class="login-btn">
+                    🔐 Sign In
+                </button>
+
+
+                <!-- Register link -->
+                <div class="register-link">
+
+                    Don't have an account?
+
+                    <a asp-controller="Account"
+                       asp-action="Register">
+                        Create an account
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document
+            .getElementById("loginPasswordToggle")
+            ?.addEventListener("click", function() {
+
+                const input =
+                    document.getElementById("loginPassword");
+
+                const icon =
+                    document.getElementById("loginPasswordIcon");
+
+                if (input.type === "password") {
+
+                    input.type = "text";
+                    icon.textContent = "🙈";
+
+                    this.setAttribute(
+                        "aria-label",
+                        "Hide password"
+                    );
+
+                } else {
+
+                    input.type = "password";
+                    icon.textContent = "👁️";
+
+                    this.setAttribute(
+                        "aria-label",
+                        "Show password"
+                    );
+                }
+
+            });
+
+    </script>
+}

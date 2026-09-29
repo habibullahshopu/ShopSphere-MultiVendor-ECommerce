@@ -1,0 +1,259 @@
+﻿@model IEnumerable<ShopSphere.ViewModels.VendorOrderViewModel>
+
+@{
+    ViewData["Title"] = "Vendor Orders";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Vendor Orders</h2>
+            <p class="text-muted mb-0">
+                View orders containing your store products.
+            </p>
+        </div>
+
+        <a asp-area="Vendor"
+           asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Dashboard
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+
+                <div class="fs-1 mb-3">📦</div>
+
+                <h4 class="fw-bold">No Orders Yet</h4>
+
+                <p class="text-muted">
+                    You don't have any orders containing your products yet.
+                </p>
+
+                <a asp-area="Vendor"
+                   asp-controller="Products"
+                   asp-action="Index"
+                   class="btn btn-primary">
+                    Manage Products
+                </a>
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var order in Model)
+            {
+                <div class="col-12">
+
+                    <div class="card shadow-sm border-0">
+
+                        <div class="card-header bg-white py-3">
+
+                            <div class="row align-items-center">
+
+                                <div class="col-md-3">
+                                    <div class="text-muted small">
+                                        Order
+                                    </div>
+
+                                    <div class="fw-bold">
+                                        #@order.OrderId
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="text-muted small">
+                                        Customer
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        @order.CustomerName
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        @order.CustomerEmail
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="text-muted small">
+                                        Order Date
+                                    </div>
+
+                                    <div>
+                                        @order.OrderDate.ToLocalTime().ToString("dd MMM yyyy")
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="text-muted small">
+                                        Status
+                                    </div>
+
+                                    @if (order.OrderStatus == "Confirmed")
+                                    {
+                                        <span class="badge bg-success">
+                                            @order.OrderStatus
+                                        </span>
+                                    }
+                                    else if (order.OrderStatus == "Cancelled")
+                                    {
+                                        <span class="badge bg-danger">
+                                            @order.OrderStatus
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            @order.OrderStatus
+                                        </span>
+                                    }
+                                </div>
+
+                                <div class="col-md-2 text-md-end mt-3 mt-md-0">
+
+                                    <a asp-area="Vendor"
+                                       asp-controller="Orders"
+                                       asp-action="Details"
+                                       asp-route-id="@order.OrderId"
+                                       class="btn btn-sm btn-primary">
+                                        View Details
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+
+                                <table class="table align-middle mb-0">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th class="text-center">Quantity</th>
+                                            <th class="text-end">Unit Price</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        @foreach (var item in order.Items)
+                                        {
+                                            <tr>
+
+                                                <td>
+                                                    <div class="fw-semibold">
+                                                        @item.ProductName
+                                                    </div>
+
+                                                    <div class="small text-muted">
+                                                        Product #@item.ProductId
+                                                    </div>
+                                                </td>
+
+                                                <td class="text-center">
+                                                    @item.Quantity
+                                                </td>
+
+                                                <td class="text-end">
+                                                    ৳@item.UnitPrice.ToString("N2")
+                                                </td>
+
+                                                <td class="text-end fw-semibold">
+                                                    ৳@item.TotalPrice.ToString("N2")
+                                                </td>
+
+                                            </tr>
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer bg-light">
+
+                            <div class="row text-center text-md-end">
+
+                                <div class="col-md-4">
+                                    <span class="text-muted">
+                                        Vendor Sales:
+                                    </span>
+
+                                    <strong>
+                                        ৳@order.VendorSubtotal.ToString("N2")
+                                    </strong>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <span class="text-muted">
+                                        Commission:
+                                    </span>
+
+                                    <strong class="text-danger">
+                                        - ৳@order.CommissionAmount.ToString("N2")
+                                    </strong>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <span class="text-muted">
+                                        Your Earnings:
+                                    </span>
+
+                                    <strong class="text-success">
+                                        ৳@order.VendorEarnings.ToString("N2")
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

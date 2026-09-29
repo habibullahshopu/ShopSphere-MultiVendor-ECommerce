@@ -1,0 +1,163 @@
+﻿@model ShopSphere.Models.ReturnRequest
+
+@{
+    ViewData["Title"] = "Return Details";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Return Request #@Model.Id
+            </h2>
+
+            <p class="text-muted mb-0">
+                Order #@Model.OrderId
+            </p>
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left me-1"></i>
+            My Returns
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Return Information
+                    </h5>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Reason
+                        </small>
+
+                        <div class="fw-semibold">
+                            @Model.Reason
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Description
+                        </small>
+
+                        <div>
+                            @(string.IsNullOrWhiteSpace(Model.Description)
+                                ? "No additional details provided."
+                                : Model.Description)
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Submitted
+                        </small>
+
+                        <div>
+                            @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.AdminNote))
+                    {
+                        <div class="alert alert-light border mt-4">
+                            <strong>Admin Note:</strong>
+                            <br />
+                            @Model.AdminNote
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Return & Refund Status
+                    </h5>
+
+                    <div class="mb-4">
+
+                        <small class="text-muted">
+                            Return Status
+                        </small>
+
+                        <div class="mt-1">
+
+                            @if (Model.Status == "Pending")
+                            {
+                                <span class="badge bg-warning text-dark fs-6">
+                                    Pending
+                                </span>
+                            }
+                            else if (Model.Status == "Approved")
+                            {
+                                <span class="badge bg-primary fs-6">
+                                    Approved
+                                </span>
+                            }
+                            else if (Model.Status == "Rejected")
+                            {
+                                <span class="badge bg-danger fs-6">
+                                    Rejected
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success fs-6">
+                                    Completed
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <small class="text-muted">
+                            Refund Amount
+                        </small>
+
+                        <div class="fs-4 fw-bold">
+                            ৳@Model.RefundAmount.ToString("N2")
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <small class="text-muted">
+                            Refund Status
+                        </small>
+
+                        <div class="fw-semibold mt-1">
+                            @(Model.RefundStatus ?? "Pending")
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

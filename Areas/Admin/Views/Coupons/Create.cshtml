@@ -1,0 +1,450 @@
+﻿@model ShopSphere.Models.Coupon
+
+@{
+    ViewData["Title"] = "Create Coupon";
+}
+
+<style>
+    .coupon-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        border-radius: 20px;
+        padding: 28px;
+    }
+
+    .form-card {
+        border: 0;
+        border-radius: 20px;
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .discount-type-card {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 15px;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .discount-type-card:hover {
+            border-color: #0d6efd;
+            background: #f8fbff;
+        }
+
+    .help-text {
+        font-size: .85rem;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="coupon-header shadow-sm mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between
+            align-items-center gap-3">
+
+            <div>
+                <h1 class="fw-bold mb-2">
+                    🎟️ Create Coupon
+                </h1>
+
+                <p class="mb-0 opacity-75">
+                    Create a new discount coupon for your customers.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Coupons"
+               asp-action="Index"
+               class="btn btn-light">
+
+                ← Back to Coupons
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- FORM -->
+    <div class="card form-card shadow-sm">
+
+        <div class="card-body p-4 p-lg-5">
+
+            <form asp-area="Admin"
+                  asp-controller="Coupons"
+                  asp-action="Create"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger"
+                     role="alert"></div>
+
+
+                <!-- BASIC INFORMATION -->
+                <h5 class="section-title mb-4">
+                    📝 Basic Information
+                </h5>
+
+                <div class="row g-4 mb-5">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Code"
+                               class="form-label">
+                            Coupon Code
+                        </label>
+
+                        <input asp-for="Code"
+                               class="form-control form-control-lg"
+                               placeholder="Example: WELCOME10"
+                               style="text-transform: uppercase;" />
+
+                        <div class="help-text mt-1">
+                            Customers will enter this code at checkout.
+                        </div>
+
+                        <span asp-validation-for="Code"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Description"
+                               class="form-label">
+                            Description
+                        </label>
+
+                        <input asp-for="Description"
+                               class="form-control form-control-lg"
+                               placeholder="Example: 10% off for new customers" />
+
+                        <div class="help-text mt-1">
+                            Optional short description for Admin reference.
+                        </div>
+
+                        <span asp-validation-for="Description"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DISCOUNT -->
+                <h5 class="section-title mb-4">
+                    💰 Discount Settings
+                </h5>
+
+                <div class="row g-4 mb-5">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="DiscountType"
+                               class="form-label">
+                            Discount Type
+                        </label>
+
+                        <select asp-for="DiscountType"
+                                class="form-select form-select-lg"
+                                id="discountType">
+
+                            <option value="Percentage">
+                                Percentage (%)
+                            </option>
+
+                            <option value="Fixed">
+                                Fixed Amount (৳)
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="DiscountType"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="DiscountValue"
+                               class="form-label"
+                               id="discountValueLabel">
+
+                            Discount Value (%)
+
+                        </label>
+
+                        <div class="input-group input-group-lg">
+
+                            <span class="input-group-text"
+                                  id="discountPrefix">
+                                %
+                            </span>
+
+                            <input asp-for="DiscountValue"
+                                   class="form-control"
+                                   type="number"
+                                   step="0.01"
+                                   min="0.01"
+                                   placeholder="10" />
+
+                        </div>
+
+                        <div class="help-text mt-1"
+                             id="discountHelp">
+                            Enter a percentage between 0.01 and 100.
+                        </div>
+
+                        <span asp-validation-for="DiscountValue"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="MinimumOrderAmount"
+                               class="form-label">
+
+                            Minimum Order Amount
+
+                        </label>
+
+                        <div class="input-group input-group-lg">
+
+                            <span class="input-group-text">
+                                ৳
+                            </span>
+
+                            <input asp-for="MinimumOrderAmount"
+                                   class="form-control"
+                                   type="number"
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="0" />
+
+                        </div>
+
+                        <div class="help-text mt-1">
+                            Set 0 if there is no minimum order requirement.
+                        </div>
+
+                        <span asp-validation-for="MinimumOrderAmount"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VALIDITY -->
+                <h5 class="section-title mb-4">
+                    📅 Validity & Usage
+                </h5>
+
+                <div class="row g-4 mb-5">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="StartDate"
+                               class="form-label">
+                            Start Date
+                        </label>
+
+                        <input asp-for="StartDate"
+                               type="datetime-local"
+                               class="form-control form-control-lg" />
+
+                        <div class="help-text mt-1">
+                            Leave empty to make the coupon available immediately.
+                        </div>
+
+                        <span asp-validation-for="StartDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="ExpiryDate"
+                               class="form-label">
+                            Expiry Date
+                        </label>
+
+                        <input asp-for="ExpiryDate"
+                               type="datetime-local"
+                               class="form-control form-control-lg" />
+
+                        <div class="help-text mt-1">
+                            Leave empty for no expiry date.
+                        </div>
+
+                        <span asp-validation-for="ExpiryDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="UsageLimit"
+                               class="form-label">
+                            Usage Limit
+                        </label>
+
+                        <input asp-for="UsageLimit"
+                               type="number"
+                               min="1"
+                               class="form-control form-control-lg"
+                               placeholder="Example: 100" />
+
+                        <div class="help-text mt-1">
+                            Leave empty for unlimited usage.
+                        </div>
+
+                        <span asp-validation-for="UsageLimit"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Coupon Status
+                        </label>
+
+                        <div class="form-check form-switch mt-2">
+
+                            <input asp-for="IsActive"
+                                   class="form-check-input"
+                                   role="switch"
+                                   style="width: 3em; height: 1.5em;" />
+
+                            <label asp-for="IsActive"
+                                   class="form-check-label ms-2">
+                                Active
+                            </label>
+
+                        </div>
+
+                        <div class="help-text mt-1">
+                            Inactive coupons cannot be used by customers.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+                <hr class="mb-4" />
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary btn-lg px-4">
+
+                        🎟️ Create Coupon
+
+                    </button>
+
+                    <a asp-area="Admin"
+                       asp-controller="Coupons"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary btn-lg px-4">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        const discountType =
+            document.getElementById("discountType");
+
+        const discountPrefix =
+            document.getElementById("discountPrefix");
+
+        const discountValueLabel =
+            document.getElementById("discountValueLabel");
+
+        const discountHelp =
+            document.getElementById("discountHelp");
+
+        function updateDiscountUI() {
+
+            if (discountType.value === "Fixed") {
+
+                discountPrefix.textContent = "৳";
+
+                discountValueLabel.textContent =
+                    "Discount Value (৳)";
+
+                discountHelp.textContent =
+                    "Enter the fixed discount amount in Bangladeshi Taka.";
+
+            } else {
+
+                discountPrefix.textContent = "%";
+
+                discountValueLabel.textContent =
+                    "Discount Value (%)";
+
+                discountHelp.textContent =
+                    "Enter a percentage between 0.01 and 100.";
+
+            }
+        }
+
+        discountType.addEventListener(
+            "change",
+            updateDiscountUI
+        );
+
+        updateDiscountUI();
+
+    </script>
+}

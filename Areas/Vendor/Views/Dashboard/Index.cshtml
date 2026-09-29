@@ -1,0 +1,306 @@
+﻿@model ShopSphere.ViewModels.VendorEarningsViewModel
+
+@{
+    ViewData["Title"] = "Vendor Dashboard";
+}
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Vendor Dashboard 🏪
+            </h2>
+
+            <p class="text-muted mb-0">
+                Welcome back, @Model.StoreName
+            </p>
+        </div>
+
+        <span class="badge bg-success fs-6 px-3 py-2 mt-2 mt-md-0">
+            ✓ Approved Vendor
+        </span>
+
+    </div>
+
+
+    <!-- Statistics Cards -->
+    <div class="row g-4">
+
+        <!-- Store -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-1 mb-3">
+                        🏪
+                    </div>
+
+                    <h6 class="text-muted mb-2">
+                        My Store
+                    </h6>
+
+                    <h5 class="fw-bold text-primary">
+                        @Model.StoreName
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Your marketplace store
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Orders -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-1 mb-3">
+                        📦
+                    </div>
+
+                    <h6 class="text-muted mb-2">
+                        Total Orders
+                    </h6>
+
+                    <h3 class="fw-bold mb-1">
+                        @Model.TotalOrders
+                    </h3>
+
+                    <p class="text-muted small mb-0">
+                        Paid orders containing your products
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Sales -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-1 mb-3">
+                        💰
+                    </div>
+
+                    <h6 class="text-muted mb-2">
+                        Total Sales
+                    </h6>
+
+                    <h3 class="fw-bold text-success mb-1">
+                        ৳@Model.TotalSales.ToString("N2")
+                    </h3>
+
+                    <p class="text-muted small mb-0">
+                        Gross sales from your products
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Net Earnings -->
+        <div class="col-md-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="fs-1 mb-3">
+                        📈
+                    </div>
+
+                    <h6 class="text-muted mb-2">
+                        Net Earnings
+                    </h6>
+
+                    <h3 class="fw-bold text-primary mb-1">
+                        ৳@Model.NetEarnings.ToString("N2")
+                    </h3>
+
+                    <p class="text-muted small mb-0">
+                        Earnings after commission
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Earnings Summary -->
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+        <div class="card-header bg-primary text-white rounded-top-4 p-4">
+
+            <h5 class="fw-bold mb-1">
+                Earnings Summary
+            </h5>
+
+            <p class="mb-0 opacity-75">
+                Your sales and marketplace commission overview
+            </p>
+
+        </div>
+
+
+        <div class="card-body p-4">
+
+            <div class="row g-4">
+
+                <!-- Total Sales -->
+                <div class="col-md-4">
+
+                    <div class="bg-light rounded-4 p-4 h-100">
+
+                        <div class="text-muted small mb-2">
+                            Total Sales
+                        </div>
+
+                        <h3 class="fw-bold mb-0">
+                            ৳@Model.TotalSales.ToString("N2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Commission -->
+                <div class="col-md-4">
+
+                    <div class="bg-light rounded-4 p-4 h-100">
+
+                        <div class="text-muted small mb-2">
+                            Platform Commission
+                        </div>
+
+                        <h3 class="fw-bold text-danger mb-1">
+                            ৳@Model.TotalCommission.ToString("N2")
+                        </h3>
+
+                        <span class="badge bg-info text-dark">
+                            @Model.CommissionRate.ToString("0.00")%
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Net Earnings -->
+                <div class="col-md-4">
+
+                    <div class="bg-light rounded-4 p-4 h-100">
+
+                        <div class="text-muted small mb-2">
+                            Your Net Earnings
+                        </div>
+
+                        <h3 class="fw-bold text-success mb-0">
+                            ৳@Model.NetEarnings.ToString("N2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Store Information -->
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+        <div class="card-header bg-white border-0 p-4">
+
+            <h5 class="fw-bold mb-1">
+                Store Information
+            </h5>
+
+            <p class="text-muted mb-0">
+                Your vendor account information
+            </p>
+
+        </div>
+
+
+        <div class="card-body p-4">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="text-muted small mb-1">
+                        Store Name
+                    </label>
+
+                    <div class="fw-semibold">
+                        @Model.StoreName
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="text-muted small mb-1">
+                        Commission Rate
+                    </label>
+
+                    <div>
+
+                        <span class="badge bg-info text-dark px-3 py-2">
+                            @Model.CommissionRate.ToString("0.00")%
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert alert-info rounded-4 mb-0">
+
+                <strong>Commission Information:</strong>
+
+                <span>
+                    ShopSphere currently applies a
+                    @Model.CommissionRate.ToString("0.00")%
+                    commission rate to your sales.
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

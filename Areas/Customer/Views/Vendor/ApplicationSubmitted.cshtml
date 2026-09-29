@@ -1,0 +1,113 @@
+﻿@model ShopSphere.Models.Vendor
+
+@{
+    ViewData["Title"] = "Application Submitted";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7 col-md-9">
+
+            <div class="card border-0 shadow-lg rounded-4">
+
+                <div class="card-body p-5 text-center">
+
+                    <!-- Success Icon -->
+                    <div class="mb-4" style="font-size: 75px;">
+                        ✅
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="fw-bold text-success mb-3">
+                        Application Submitted Successfully!
+                    </h1>
+
+                    <p class="lead text-muted mb-4">
+                        Thank you for applying to become a seller on
+                        <strong>ShopSphere</strong>.
+                    </p>
+
+                    <!-- Store Information -->
+                    <div class="bg-light rounded-4 p-4 mb-4 text-start">
+
+                        <h5 class="fw-bold mb-3">
+                            🏪 Your Store Application
+                        </h5>
+
+                        <div class="mb-2">
+                            <strong>Store Name:</strong>
+                            @Model.StoreName
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.City))
+                        {
+                            <div class="mb-2">
+                                <strong>City:</strong>
+                                @Model.City
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Country))
+                        {
+                            <div>
+                                <strong>Country:</strong>
+                                @Model.Country
+                            </div>
+                        }
+
+                    </div>
+
+                    <!-- Pending Status -->
+                    <div class="alert alert-warning rounded-4">
+
+                        <div class="fw-bold mb-1">
+                            ⏳ Application Under Review
+                        </div>
+
+                        <div>
+                            Your application is currently waiting for
+                            administrator approval.
+                        </div>
+
+                    </div>
+
+                    <p class="text-muted">
+                        Once your application is approved, you will be able
+                        to access your Vendor Dashboard and start adding
+                        products to your store.
+                    </p>
+
+                    <!-- Buttons -->
+                    <div class="mt-4">
+
+                        <a asp-area="Customer"
+                           asp-controller="Home"
+                           asp-action="Index"
+                           class="btn btn-primary px-4 me-2">
+
+                            🏠 Back to Home
+
+                        </a>
+
+                        <a asp-area="Customer"
+                           asp-controller="Products"
+                           asp-action="Index"
+                           class="btn btn-outline-primary px-4">
+
+                            🛍️ Continue Shopping
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

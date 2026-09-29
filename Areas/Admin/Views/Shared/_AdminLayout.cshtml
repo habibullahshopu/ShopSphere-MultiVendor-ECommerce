@@ -1,0 +1,588 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ShopSphere.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    var currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString();
+
+    // Vendor section active state
+    var isVendorSection =
+        currentController == "Vendor";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - ShopSphere Admin
+    </title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Site CSS -->
+    <link rel="stylesheet"
+          href="/css/site.css"
+          asp-append-version="true" />
+
+    <style>
+
+            /* =====================================================
+                       BODY
+                    ===================================================== */
+
+            body {
+                background: #f5f7fb;
+            }
+
+
+            /* =====================================================
+                       SIDEBAR
+                    ===================================================== */
+
+            .admin-sidebar {
+                width: 260px;
+                min-height: 100vh;
+                background: linear-gradient( 180deg, #1e3a8a 0%, #312e81 100% );
+                position: fixed;
+                left: 0;
+                top: 0;
+                padding: 25px 15px;
+                color: white;
+                z-index: 1000;
+            }
+
+
+            /* =====================================================
+                       BRAND
+                    ===================================================== */
+
+            .admin-brand {
+                font-size: 26px;
+                font-weight: 700;
+                color: white;
+                text-decoration: none;
+                display: block;
+                margin-bottom: 35px;
+                padding-left: 12px;
+            }
+
+
+                .admin-brand:hover {
+                    color: white;
+                }
+
+
+            /* =====================================================
+                       SIDEBAR NAVIGATION
+                    ===================================================== */
+
+            .admin-sidebar .nav-link {
+                color: rgba(255,255,255,.8);
+                padding: 12px 15px;
+                border-radius: 10px;
+                margin-bottom: 8px;
+                transition: .2s;
+                font-weight: 500;
+            }
+
+
+                .admin-sidebar .nav-link:hover {
+                    background: rgba(255,255,255,.15);
+                    color: white;
+                    transform: translateX(2px);
+                }
+
+
+                .admin-sidebar .nav-link.active {
+                    background: white;
+                    color: #1e3a8a;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+                }
+
+
+            /* =====================================================
+                       MAIN AREA
+                    ===================================================== */
+
+            .admin-main {
+                margin-left: 260px;
+                min-height: 100vh;
+            }
+
+
+            /* =====================================================
+                       TOPBAR
+                    ===================================================== */
+
+            .admin-topbar {
+                background: white;
+                padding: 18px 35px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+
+            .admin-topbar-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1f2937;
+            }
+
+
+            /* =====================================================
+                       ADMIN PROFILE
+                    ===================================================== */
+
+            .admin-user-section {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+
+            .admin-user-info {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #64748b;
+                font-size: 15px;
+                font-weight: 600;
+            }
+
+
+            /* =====================================================
+                       LOGOUT BUTTON
+                    ===================================================== */
+
+            .admin-logout-btn {
+                border: 1px solid #dc2626;
+                color: #dc2626;
+                background: white;
+                border-radius: 8px;
+                padding: 7px 14px;
+                font-size: 14px;
+                font-weight: 600;
+                transition: .2s;
+            }
+
+
+                .admin-logout-btn:hover {
+                    background: #dc2626;
+                    color: white;
+                }
+
+
+            /* =====================================================
+                       CONTENT
+                    ===================================================== */
+
+            .admin-content {
+                padding: 35px;
+            }
+
+
+            /* =====================================================
+                       RESPONSIVE
+                    ===================================================== */
+
+            @@media (max-width: 768px) {
+
+                .admin-sidebar {
+                    width: 220px;
+                }
+
+
+                .admin-main {
+                    margin-left: 220px;
+                }
+
+
+                .admin-content {
+                    padding: 20px;
+                }
+
+
+                .admin-topbar {
+                    padding: 15px 20px;
+                }
+
+
+                .admin-user-info {
+                    display: none;
+                }
+            }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         ADMIN SIDEBAR
+    ====================================================== -->
+
+    <aside class="admin-sidebar">
+
+
+        <!-- =================================================
+             BRAND
+        ================================================== -->
+
+        <a asp-area="Admin"
+           asp-controller="Dashboard"
+           asp-action="Index"
+           class="admin-brand">
+
+            🛍️ ShopSphere
+
+        </a>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <ul class="nav flex-column">
+
+
+            <!-- =================================================
+                 DASHBOARD
+            ================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Dashboard"
+                       ? "active"
+                       : "")"
+                   asp-area="Admin"
+                   asp-controller="Dashboard"
+                   asp-action="Index">
+
+                    📊 Dashboard
+
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 CATEGORIES
+            ================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Categories"
+                       ? "active"
+                       : "")"
+                   asp-area="Admin"
+                   asp-controller="Categories"
+                   asp-action="Index">
+
+                    📁 Categories
+
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 PRODUCTS
+            ================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Products"
+                       ? "active"
+                       : "")"
+                   asp-area="Admin"
+                   asp-controller="Products"
+                   asp-action="Index">
+
+                    📦 Products
+
+                </a>
+
+            </li>
+            <!-- =================================================
+     AI SALES PREDICTION
+================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "SalesPrediction"
+                      ? "active"
+                      : "")"
+                   asp-area="Admin"
+                   asp-controller="SalesPrediction"
+                   asp-action="Index">
+
+                    🤖 AI Sales Prediction
+
+                </a>
+
+            </li>
+
+            <!-- =================================================
+                 ORDERS
+            ================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Orders"
+                       ? "active"
+                       : "")"
+                   asp-area="Admin"
+                   asp-controller="Orders"
+                   asp-action="Index">
+
+                    🛒 Orders
+
+                </a>
+
+            </li>
+
+            <!--return-->
+
+            <li class="nav-item">
+            <a class="nav-link"
+               asp-area="Admin"
+               asp-controller="Returns"
+               asp-action="Index">
+
+                <i class="bi bi-arrow-return-left me-2"></i>
+                Returns
+
+            </a>
+        </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   asp-area="Admin"
+                   asp-controller="Support"
+                   asp-action="Index">
+                    <span>🎧</span>
+                    <span>Support Tickets</span>
+                </a>
+            </li>
+
+
+
+
+            <!-- =================================================
+     REVIEWS
+================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Reviews"
+                      ? "active"
+                      : "")"
+                   asp-area="Admin"
+                   asp-controller="Reviews"
+                   asp-action="Index">
+
+                    ⭐ Reviews
+
+                </a>
+
+            </li>
+
+            <!-- =================================================
+     COUPONS
+================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Coupons"
+                      ? "active"
+                      : "")"
+                   asp-area="Admin"
+                   asp-controller="Coupons"
+                   asp-action="Index">
+
+                    🎟️ Coupons
+
+                </a>
+
+            </li>
+
+            <!-- =================================================
+                 VENDOR MANAGEMENT
+            ================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(isVendorSection
+                       ? "active"
+                       : "")"
+                   asp-area="Admin"
+                   asp-controller="Vendor"
+                   asp-action="Index">
+
+                    🏪 Vendor Management
+
+                </a>
+
+            </li>
+
+
+            <!-- =================================================
+                 USERS
+            ================================================== -->
+
+            <li class="nav-item">
+
+                <a class="nav-link
+                    @(currentController == "Users"
+                       ? "active"
+                       : "")"
+                   asp-area="Admin"
+                   asp-controller="Users"
+                   asp-action="Index">
+
+                    👥 Users
+
+                </a>
+
+            </li>
+
+
+        </ul>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <div class="admin-main">
+
+
+        <!-- =================================================
+             TOPBAR
+        ================================================== -->
+
+        <header class="admin-topbar
+            d-flex
+            justify-content-between
+            align-items-center">
+
+
+            <!-- =================================================
+                 TOPBAR LEFT
+            ================================================== -->
+
+            <div>
+
+                <div class="admin-topbar-title">
+
+                    Admin Panel
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 TOPBAR RIGHT
+            ================================================== -->
+
+            <div class="admin-user-section">
+
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+
+                    <!-- Admin Name -->
+
+                    <div class="admin-user-info">
+
+                        👤 Administrator
+
+                    </div>
+
+
+                    <!-- Logout -->
+
+                    <form asp-area="Identity"
+                          asp-page="/Account/Logout"
+                          asp-route-returnUrl="@Url.Content("~/")"
+                          method="post"
+                          class="m-0">
+
+                        <button type="submit"
+                                class="admin-logout-btn">
+
+                            🚪 Logout
+
+                        </button>
+
+                    </form>
+
+                }
+
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <main class="admin-content">
+
+            @RenderBody()
+
+        </main>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         BOOTSTRAP JAVASCRIPT
+    ====================================================== -->
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- =====================================================
+         OPTIONAL PAGE SCRIPTS
+    ====================================================== -->
+    @await RenderSectionAsync(
+            "Scripts",
+            required: false
+        )
+
+
+</body>
+
+</html>

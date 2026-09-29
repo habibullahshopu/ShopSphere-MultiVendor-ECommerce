@@ -1,0 +1,406 @@
+﻿@model ShopSphere.Models.ProductReview
+
+@{
+    ViewData["Title"] = "Review Details";
+
+    var customerName =
+        !string.IsNullOrWhiteSpace(Model.User?.FullName)
+            ? Model.User.FullName
+            : "Customer";
+
+    var customerInitial =
+        !string.IsNullOrWhiteSpace(customerName)
+            ? customerName.Substring(0, 1).ToUpper()
+            : "C";
+
+    var rating = Math.Max(1, Math.Min(5, Model.Rating));
+
+    var stars =
+        new string('★', rating) +
+        new string('☆', 5 - rating);
+}
+
+<style>
+    .review-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #fff;
+        border-radius: 20px;
+        padding: 28px;
+    }
+
+    .details-card {
+        border: 0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .customer-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #0d6efd;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .rating-stars {
+        color: #ffc107;
+        font-size: 1.7rem;
+        letter-spacing: 2px;
+    }
+
+    .comment-box {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 24px;
+        white-space: pre-line;
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    .info-label {
+        color: #6c757d;
+        font-size: .85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .info-value {
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="review-header shadow-sm mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+            <div>
+                <h1 class="fw-bold mb-2">
+                    ⭐ Review Details
+                </h1>
+
+                <p class="mb-0 opacity-75">
+                    View customer feedback and manage this review.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Reviews"
+               asp-action="Index"
+               class="btn btn-light">
+                ← Back to Reviews
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ALERTS -->
+    <!-- ========================================================= -->
+    @if (TempData["ReviewSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            ✅ @TempData["ReviewSuccess"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["ReviewError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            ⚠️ @TempData["ReviewError"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <div class="row g-4">
+
+        <!-- ===================================================== -->
+        <!-- REVIEW -->
+        <!-- ===================================================== -->
+
+        <div class="col-lg-8">
+
+            <div class="card details-card shadow-sm">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <!-- Customer -->
+                    <div class="d-flex align-items-center gap-3 mb-4">
+
+                        <div class="customer-avatar">
+                            @customerInitial
+                        </div>
+
+                        <div>
+
+                            <h4 class="fw-bold mb-1">
+                                @customerName
+                            </h4>
+
+                            <div class="text-muted">
+                                @(Model.User?.Email ?? "No email available")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="mb-4" />
+
+
+                    <!-- Product -->
+                    <div class="mb-4">
+
+                        <div class="info-label mb-1">
+                            Product
+                        </div>
+
+                        <div class="fs-4 fw-bold">
+                            @(Model.Product?.Name ?? "Unknown Product")
+                        </div>
+
+                    </div>
+
+
+                    <!-- Rating -->
+                    <div class="mb-4">
+
+                        <div class="info-label mb-1">
+                            Rating
+                        </div>
+
+                        <div class="rating-stars">
+                            @stars
+                        </div>
+
+                        <div class="text-muted mt-1">
+                            @Model.Rating out of 5
+                        </div>
+
+                    </div>
+
+
+                    <!-- Review -->
+                    <div class="mb-4">
+
+                        <div class="info-label mb-2">
+                            Customer Review
+                        </div>
+
+                        <div class="comment-box">
+                            @Model.Comment
+                        </div>
+
+                    </div>
+
+
+                    <!-- Dates -->
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Submitted
+                            </div>
+
+                            <div class="info-value">
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy, hh:mm tt")
+                            </div>
+
+                        </div>
+
+
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <div class="col-md-6">
+
+                                <div class="info-label mb-1">
+                                    Last Updated
+                                </div>
+
+                                <div class="info-value">
+                                    @(Model.UpdatedAt.Value
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy, hh:mm tt"))
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- MANAGEMENT -->
+        <!-- ===================================================== -->
+
+        <div class="col-lg-4">
+
+            <div class="card details-card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Review Management
+                    </h5>
+
+
+                    <!-- Status -->
+                    <div class="mb-4">
+
+                        <div class="info-label mb-2">
+                            Current Status
+                        </div>
+
+                        @if (Model.IsApproved)
+                        {
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                                ✅ Approved
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                                ⏳ Pending / Hidden
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <!-- Approve -->
+                    @if (!Model.IsApproved)
+                    {
+                        <form asp-area="Admin"
+                              asp-controller="Reviews"
+                              asp-action="Approve"
+                              method="post"
+                              class="mb-2">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-success w-100">
+                                ✅ Approve Review
+                            </button>
+
+                        </form>
+                    }
+
+
+                    <!-- Reject -->
+                    @if (Model.IsApproved)
+                    {
+                        <form asp-area="Admin"
+                              asp-controller="Reviews"
+                              asp-action="Reject"
+                              method="post"
+                              class="mb-2">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-warning w-100">
+                                🚫 Hide Review
+                            </button>
+
+                        </form>
+                    }
+
+
+                    <!-- Delete -->
+                    <form asp-area="Admin"
+                          asp-controller="Reviews"
+                          asp-action="Delete"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to permanently delete this review?');">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="id"
+                               value="@Model.Id" />
+
+                        <button type="submit"
+                                class="btn btn-outline-danger w-100">
+                            🗑️ Delete Review
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- Review ID -->
+            <div class="card details-card shadow-sm mt-4">
+
+                <div class="card-body p-4">
+
+                    <div class="info-label mb-1">
+                        Review ID
+                    </div>
+
+                    <div class="fw-bold">
+                        #@Model.Id
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

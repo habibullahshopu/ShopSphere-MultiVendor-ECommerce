@@ -1,0 +1,66 @@
+﻿@model IEnumerable<ShopSphere.Models.Product>
+
+@{
+    ViewData["Title"] = "Test Products";
+}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+        <h1 class="fw-bold">Test Products</h1>
+        <p class="text-muted">
+            Products loaded from ShopSphere database.
+        </p>
+    </div>
+
+    <div class="row g-4">
+       
+        @foreach (var product in Model)
+        {
+            <div class="col-md-4 col-lg-3">
+
+                <div class="card h-100 shadow-sm">
+
+                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                    {
+                        <img src="@product.ImageUrl"
+                             class="card-img-top"
+                             style="height:220px; object-fit:cover;"
+                             alt="@product.Name" />
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center bg-light"
+                             style="height:220px;">
+                            <span class="text-muted">No Image</span>
+                        </div>
+                    }
+
+                    <div class="card-body">
+
+                        <h5 class="card-title">
+                            @product.Name
+                        </h5>
+
+                        <p class="text-muted small mb-2">
+                            @product.Category?.Name
+                        </p>
+
+                        <h5 class="text-primary">
+                            ৳@product.Price.ToString("N2")
+                        </h5>
+
+                        <p class="small">
+                            Stock: @product.StockQuantity
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

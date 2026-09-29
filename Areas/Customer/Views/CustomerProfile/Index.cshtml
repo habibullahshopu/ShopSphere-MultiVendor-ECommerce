@@ -1,0 +1,342 @@
+﻿@model ShopSphere.ViewModels.CustomerProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold mb-2">
+            👤 My Profile
+        </h1>
+
+        <p class="text-muted mb-0">
+            Manage your ShopSphere account information.
+        </p>
+    </div>
+
+
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm"
+             role="alert">
+
+            ✅ @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- Validation Summary -->
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3">
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- Profile Form -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <h4 class="fw-bold mb-4">
+                        Account Information
+                    </h4>
+
+
+                    <form asp-action="Index"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+
+                        <!-- Full Name -->
+                        <div class="mb-4">
+
+                            <label asp-for="FullName"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="FullName"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter your full name" />
+
+                            <span asp-validation-for="FullName"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Email -->
+                        <div class="mb-4">
+
+                            <label asp-for="Email"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control form-control-lg bg-light"
+                                   readonly />
+
+                            <div class="form-text">
+                                Your email is used as your login account.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Phone -->
+                        <div class="mb-4">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter your phone number" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <hr class="my-4" />
+
+
+                        <h5 class="fw-bold mb-3">
+                            📍 Address Information
+                        </h5>
+
+
+                        <!-- Address -->
+                        <div class="mb-4">
+
+                            <label asp-for="Address"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <textarea asp-for="Address"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Enter your address">
+                            </textarea>
+
+                            <span asp-validation-for="Address"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+                            <!-- City -->
+                            <div class="col-md-6">
+
+                                <label asp-for="City"
+                                       class="form-label fw-semibold">
+                                </label>
+
+                                <input asp-for="City"
+                                       class="form-control form-control-lg"
+                                       placeholder="Enter city" />
+
+                                <span asp-validation-for="City"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <!-- Postal Code -->
+                            <div class="col-md-6">
+
+                                <label asp-for="PostalCode"
+                                       class="form-label fw-semibold">
+                                </label>
+
+                                <input asp-for="PostalCode"
+                                       class="form-control form-control-lg"
+                                       placeholder="Enter postal code" />
+
+                                <span asp-validation-for="PostalCode"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Save -->
+                        <div class="d-flex gap-2 mt-4">
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-lg px-4">
+
+                                💾 Save Changes
+
+                            </button>
+
+
+                            <a asp-area="Customer"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary btn-lg">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Account Summary -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+
+                        <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10"
+                             style="width:90px;height:90px;font-size:42px;">
+
+                            👤
+
+                        </div>
+
+                        <h4 class="fw-bold mt-3 mb-1">
+                            @Model.FullName
+                        </h4>
+
+                        <div class="text-muted">
+                            @Model.Email
+                        </div>
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Account Type
+                        </span>
+
+                        <span class="badge bg-primary">
+                            Customer
+                        </span>
+
+                    </div>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Member Since
+                        </span>
+
+                        <span class="fw-semibold">
+                            @if (ViewBag.CreatedAt != null)
+                            {
+                                @(((DateTime)ViewBag.CreatedAt)
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy"))
+                            }
+                        </span>
+
+                    </div>
+
+
+                    @if (ViewBag.IsVendor == true)
+                    {
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span class="text-muted">
+                                Vendor Status
+                            </span>
+
+                            @if (ViewBag.IsVendorApproved == true)
+                            {
+                                <span class="badge bg-success">
+                                    Approved
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+                            }
+
+                        </div>
+                    }
+
+
+                    <hr />
+
+
+                    <div class="d-grid gap-2">
+
+                        <a asp-area="Customer"
+                           asp-controller="Addresses"
+                           asp-action="Index"
+                           class="btn btn-outline-primary">
+
+                            📍 Manage Addresses
+
+                        </a>
+
+
+                        <a asp-area="Customer"
+                           asp-controller="Orders"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary">
+
+                            📦 My Orders
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,171 @@
+﻿@model ShopSphere.ViewModels.CustomerProfileViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">✏️ Edit Profile</h1>
+            <p class="text-muted mb-0">
+                Update your personal and contact information.
+            </p>
+        </div>
+
+        <a asp-area="Customer"
+           asp-controller="Account"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Back to Account
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <form asp-area="Customer"
+                          asp-controller="Account"
+                          asp-action="Edit"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger"
+                             role="alert"></div>
+
+                        <div class="row g-4">
+
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <label asp-for="FullName"
+                                       class="form-label fw-semibold">
+                                    Full Name
+                                </label>
+
+                                <input asp-for="FullName"
+                                       class="form-control"
+                                       placeholder="Enter your full name" />
+
+                                <span asp-validation-for="FullName"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label asp-for="Email"
+                                       class="form-label fw-semibold">
+                                    Email Address
+                                </label>
+
+                                <input asp-for="Email"
+                                       class="form-control bg-light"
+                                       readonly />
+
+                                <small class="text-muted">
+                                    Email address cannot be changed here.
+                                </small>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber"
+                                       class="form-label fw-semibold">
+                                    Phone Number
+                                </label>
+
+                                <input asp-for="PhoneNumber"
+                                       class="form-control"
+                                       placeholder="Enter your phone number" />
+
+                                <span asp-validation-for="PhoneNumber"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <!-- City -->
+                            <div class="col-md-6">
+                                <label asp-for="City"
+                                       class="form-label fw-semibold">
+                                    City
+                                </label>
+
+                                <input asp-for="City"
+                                       class="form-control"
+                                       placeholder="Enter your city" />
+
+                                <span asp-validation-for="City"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="col-12">
+                                <label asp-for="Address"
+                                       class="form-label fw-semibold">
+                                    Address
+                                </label>
+
+                                <textarea asp-for="Address"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Enter your full address"></textarea>
+
+                                <span asp-validation-for="Address"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <!-- Postal Code -->
+                            <div class="col-md-6">
+                                <label asp-for="PostalCode"
+                                       class="form-label fw-semibold">
+                                    Postal Code
+                                </label>
+
+                                <input asp-for="PostalCode"
+                                       class="form-control"
+                                       placeholder="Enter postal code" />
+
+                                <span asp-validation-for="PostalCode"
+                                      class="text-danger small"></span>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-flex gap-2 justify-content-end">
+
+                            <a asp-area="Customer"
+                               asp-controller="Account"
+                               asp-action="Index"
+                               class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+                                💾 Save Changes
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

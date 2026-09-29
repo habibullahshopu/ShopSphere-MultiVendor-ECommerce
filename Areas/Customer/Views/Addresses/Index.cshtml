@@ -1,0 +1,290 @@
+﻿@model IEnumerable<ShopSphere.Models.CustomerAddress>
+
+@{
+    ViewData["Title"] = "My Addresses";
+}
+
+<div class="container py-5">
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row
+        justify-content-between
+        align-items-md-center
+        gap-3 mb-4">
+
+        <div>
+
+            <h1 class="fw-bold mb-1">
+                📍 My Addresses
+            </h1>
+
+            <p class="text-muted mb-0">
+                Manage your saved delivery addresses.
+            </p>
+
+        </div>
+
+
+        <a asp-area="Customer"
+           asp-controller="Addresses"
+           asp-action="Create"
+           class="btn btn-primary">
+
+            ➕ Add New Address
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================================================
+         SUCCESS MESSAGE
+         ========================================================= -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            ✅ @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         ADDRESS LIST
+         ========================================================= -->
+    @if (Model.Any())
+    {
+
+        <div class="row g-4">
+
+            @foreach (var address in Model)
+            {
+
+                <div class="col-lg-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body p-4">
+
+                            <!-- HEADER -->
+
+                            <div class="d-flex justify-content-between
+                                align-items-start mb-3">
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+                                        @address.FullName
+                                    </h5>
+
+                                    @if (address.IsDefault)
+                                    {
+                                        <span class="badge bg-success">
+                                            ⭐ Default Address
+                                        </span>
+                                    }
+
+                                </div>
+
+                                <span class="text-muted small">
+                                    📍 @address.City
+                                </span>
+
+                            </div>
+
+
+                            <!-- PHONE -->
+
+                            <div class="mb-2">
+
+                                <strong>📱 Phone:</strong>
+
+                                @address.PhoneNumber
+
+                            </div>
+
+
+                            <!-- ADDRESS -->
+
+                            <div class="mb-2">
+
+                                <strong>🏠 Address:</strong>
+
+                                <div class="text-muted">
+                                    @address.AddressLine
+                                </div>
+
+                            </div>
+
+
+                            <!-- CITY / STATE -->
+
+                            <div class="mb-2">
+
+                                <strong>📍 Location:</strong>
+
+                                <span class="text-muted">
+
+                                    @address.City
+
+                                    @if (!string.IsNullOrWhiteSpace(address.State))
+                                    {
+                                        <text>, @address.State</text>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(address.PostalCode))
+                                    {
+                                        <text> - @address.PostalCode</text>
+                                    }
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- COUNTRY -->
+
+                            <div class="mb-3">
+
+                                <strong>🌍 Country:</strong>
+
+                                <span class="text-muted">
+                                    @address.Country
+                                </span>
+
+                            </div>
+
+
+                            <hr />
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="d-flex flex-wrap gap-2">
+
+                                <!-- EDIT -->
+
+                                <a asp-area="Customer"
+                                   asp-controller="Addresses"
+                                   asp-action="Edit"
+                                   asp-route-id="@address.Id"
+                                   class="btn btn-outline-primary">
+
+                                    ✏️ Edit
+
+                                </a>
+
+
+                                <!-- SET DEFAULT -->
+                                @if (!address.IsDefault)
+                                {
+
+                                    <form asp-area="Customer"
+                                          asp-controller="Addresses"
+                                          asp-action="SetDefault"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@address.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-outline-success">
+
+                                            ⭐ Set Default
+
+                                        </button>
+
+                                    </form>
+
+                                }
+
+
+                                <!-- DELETE -->
+
+                                <form asp-area="Customer"
+                                      asp-controller="Addresses"
+                                      asp-action="Delete"
+                                      method="post"
+                                      onsubmit="return confirm('Are you sure you want to remove this address?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@address.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger">
+
+                                        🗑️ Remove
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+
+    }
+    else
+    {
+
+        <!-- =========================================================
+             EMPTY STATE
+             ========================================================= -->
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <div style="font-size:70px;">
+                    📍
+                </div>
+
+                <h3 class="fw-bold mt-3">
+                    No Saved Addresses
+                </h3>
+
+                <p class="text-muted mb-4">
+                    Add a delivery address to make checkout
+                    faster and easier.
+                </p>
+
+                <a asp-area="Customer"
+                   asp-controller="Addresses"
+                   asp-action="Create"
+                   class="btn btn-primary px-4">
+
+                    ➕ Add Your First Address
+
+                </a>
+
+            </div>
+
+        </div>
+
+    }
+
+</div>

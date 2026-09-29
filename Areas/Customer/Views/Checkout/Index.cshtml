@@ -1,0 +1,683 @@
+﻿@using ShopSphere.Models
+
+@{
+    ViewData["Title"] = "Checkout";
+
+    var cartItems = ViewBag.CartItems as List<CartItem>
+                     ?? new List<CartItem>();
+
+    var addresses = ViewBag.Addresses as List<CustomerAddress>
+                    ?? new List<CustomerAddress>();
+
+    decimal subtotal = ViewBag.Subtotal ?? 0m;
+    decimal shippingFee = ViewBag.ShippingFee ?? 0m;
+    decimal discountAmount = ViewBag.DiscountAmount ?? 0m;
+    decimal total = ViewBag.Total ?? 0m;
+
+    string appliedCouponCode =
+        ViewBag.AppliedCouponCode?.ToString() ?? "";
+
+    string customerName = ViewBag.CustomerName ?? "";
+    string customerEmail = ViewBag.CustomerEmail ?? "";
+
+    var defaultAddress =
+        addresses.FirstOrDefault(a => a.IsDefault)
+        ?? addresses.FirstOrDefault();
+}
+
+<div class="container py-5">
+
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
+
+    <div class="mb-4">
+
+        <a asp-area="Customer"
+           asp-controller="Cart"
+           asp-action="Index"
+           class="btn btn-outline-secondary mb-3">
+            ← Back to Cart
+        </a>
+
+        <h1 class="fw-bold mb-1">
+            🛒 Checkout
+        </h1>
+
+        <p class="text-muted mb-0">
+            Review your order and select your delivery address.
+        </p>
+
+    </div>
+
+
+    <!-- =========================================================
+         ALERTS
+         ========================================================= -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            ❌ @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+    @if (TempData["CouponSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            ✅ @TempData["CouponSuccess"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <!-- =====================================================
+             LEFT SIDE
+             ===================================================== -->
+
+        <div class="col-lg-8">
+
+            <!-- =================================================
+                 DELIVERY ADDRESS
+                 ================================================= -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between
+                        align-items-center flex-wrap gap-2 mb-3">
+
+                        <div>
+
+                            <h4 class="fw-bold mb-1">
+                                📍 Delivery Address
+                            </h4>
+
+                            <p class="text-muted mb-0">
+                                Select where you want your order delivered.
+                            </p>
+
+                        </div>
+
+                        <a asp-area="Customer"
+                           asp-controller="Addresses"
+                           asp-action="Create"
+                           class="btn btn-outline-primary">
+
+                            ➕ Add New Address
+
+                        </a>
+
+                    </div>
+
+
+                    @if (!addresses.Any())
+                    {
+                        <!-- =====================================
+                             NO ADDRESS
+                             ===================================== -->
+
+                        <div class="text-center border rounded-3 p-4">
+
+                            <div class="fs-1 mb-2">
+                                📍
+                            </div>
+
+                            <h5 class="fw-bold">
+                                No saved address
+                            </h5>
+
+                            <p class="text-muted">
+                                Please add a delivery address before
+                                placing your order.
+                            </p>
+
+                            <a asp-area="Customer"
+                               asp-controller="Addresses"
+                               asp-action="Create"
+                               class="btn btn-primary">
+
+                                ➕ Add Delivery Address
+
+                            </a>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- =====================================
+                             ADDRESS LIST
+                             ===================================== -->
+
+                        <form asp-area="Customer"
+                              asp-controller="Checkout"
+                              asp-action="PlaceOrder"
+                              method="post"
+                              id="checkoutForm">
+
+                            @Html.AntiForgeryToken()
+                            <input type="hidden"
+                                   name="couponCode"
+                                   value="@appliedCouponCode" />
+
+                            <div class="row g-3">
+
+                                @foreach (var address in addresses)
+                                {
+                                    var isSelected =
+                                        defaultAddress?.Id == address.Id;
+
+                                    <div class="col-md-6">
+
+                                        <label class="w-100 h-100">
+
+                                            <input type="radio"
+                                                   name="addressId"
+                                                   value="@address.Id"
+                                                   class="d-none address-radio"
+                                            @(isSelected ? "checked" : "") />
+
+                                            <div class="address-card
+                                                border
+                                                rounded-3
+                                                p-3
+                                                h-100
+                                                @(isSelected ? "selected" : "")">
+
+                                                <div class="d-flex
+                                                    justify-content-between
+                                                    align-items-start
+                                                    gap-2">
+
+                                                    <div>
+
+                                                        <h6 class="fw-bold mb-1">
+                                                            👤 @address.FullName
+                                                        </h6>
+
+                                                        @if (address.IsDefault)
+                                                        {
+                                                            <span class="badge bg-success mb-2">
+                                                                ⭐ Default Address
+                                                            </span>
+                                                        }
+
+                                                    </div>
+
+                                                    <span class="fs-5">
+                                                        📍
+                                                    </span>
+
+                                                </div>
+
+
+                                                <div class="small text-muted mt-2">
+
+                                                    <div class="mb-1">
+                                                        📞 @address.PhoneNumber
+                                                    </div>
+
+                                                    <div class="mb-1">
+                                                        🏠 @address.AddressLine
+                                                    </div>
+
+                                                    <div class="mb-1">
+                                                        📍 @address.City
+                                                        @if (!string.IsNullOrWhiteSpace(address.State))
+                                                        {
+                                                            <span>, @address.State</span>
+                                                        }
+                                                    </div>
+
+                                                    @if (!string.IsNullOrWhiteSpace(address.PostalCode))
+                                                    {
+                                                        <div class="mb-1">
+                                                            📮 @address.PostalCode
+                                                        </div>
+                                                    }
+
+                                                    <div>
+                                                        🌎 @address.Country
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="mt-3">
+
+                                                    <span class="select-address-text">
+                                                        @(isSelected
+                                                            ? "✓ Selected"
+                                                            : "Select this address")
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        </label>
+
+                                    </div>
+                                }
+
+                            </div>
+
+
+                            <!-- =================================
+                                 CUSTOMER INFORMATION
+                                 ================================= -->
+
+                            <div class="mt-4 pt-4 border-top">
+
+                                <h5 class="fw-bold mb-3">
+                                    👤 Customer Information
+                                </h5>
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label fw-semibold">
+                                            Name
+                                        </label>
+
+                                        <input type="text"
+                                               class="form-control"
+                                               value="@customerName"
+                                               readonly />
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label fw-semibold">
+                                            Email
+                                        </label>
+
+                                        <input type="email"
+                                               class="form-control"
+                                               value="@customerEmail"
+                                               readonly />
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 PLACE ORDER
+                                 ================================= -->
+
+                            <div class="mt-4">
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-lg w-100">
+
+                                    💳 Continue to Payment
+
+                                </button>
+
+                            </div>
+
+                        </form>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORDER ITEMS
+                 ================================================= -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        📦 Your Order
+                    </h4>
+
+                    @foreach (var item in cartItems)
+                    {
+                        <div class="d-flex align-items-center
+                            justify-content-between
+                            gap-3
+                            border-bottom
+                            pb-3
+                            mb-3">
+
+                            <div class="d-flex align-items-center gap-3">
+
+                                @if (!string.IsNullOrWhiteSpace(item.Product?.ImageUrl))
+                                {
+                                    <img src="@item.Product.ImageUrl"
+                                         alt="@item.Product.Name"
+                                         style="width:70px;height:70px;object-fit:cover;"
+                                         class="rounded border" />
+                                }
+                                else
+                                {
+                                    <div class="bg-light rounded border
+                                        d-flex align-items-center
+                                        justify-content-center"
+                                         style="width:70px;height:70px;">
+
+                                        🛍️
+
+                                    </div>
+                                }
+
+
+                                <div>
+
+                                    <h6 class="fw-bold mb-1">
+                                        @item.Product?.Name
+                                    </h6>
+
+                                    <div class="text-muted small">
+                                        Qty: @item.Quantity
+                                    </div>
+
+                                    <div class="text-muted small">
+                                        Unit Price:
+                                        ৳@((item.Product?.Price ?? 0m).ToString("N2"))
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="fw-bold">
+
+                                ৳@(((item.Product?.Price ?? 0m)
+                                                                    * item.Quantity)
+                                                                    .ToString("N2"))
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RIGHT SIDE - ORDER SUMMARY
+             ===================================================== -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm sticky-lg-top"
+                 style="top: 20px;">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        🧾 Order Summary
+                    </h4>
+
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Subtotal
+                        </span>
+
+                        <span class="fw-semibold">
+                            ৳@subtotal.ToString("N2")
+                        </span>
+
+                    </div>
+                    <!-- =================================================
+     COUPON
+     ================================================= -->
+
+                    <div class="border rounded-3 p-3 mb-3">
+
+                        <h6 class="fw-bold mb-3">
+                            🎟️ Have a Coupon?
+                        </h6>
+
+                        <form asp-area="Customer"
+                              asp-controller="Checkout"
+                              asp-action="ApplyCoupon"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+                            <input type="hidden"
+                                   name="couponCode"
+                                   value="@appliedCouponCode" />
+                            <div class="input-group">
+
+                                <input type="text"
+                                       name="couponCode"
+                                       class="form-control"
+                                       placeholder="Enter coupon code"
+                                       value="@appliedCouponCode"
+                                       maxlength="50"
+                                       required />
+
+                                <button type="submit"
+                                        class="btn btn-outline-primary">
+                                    Apply
+                                </button>
+
+                            </div>
+
+                        </form>
+
+
+                        @if (TempData["CouponError"] != null)
+                        {
+                            <div class="alert alert-danger py-2 px-3 mt-3 mb-0 small">
+
+                                ❌ @TempData["CouponError"]
+
+                            </div>
+                        }
+
+
+                        @if (!string.IsNullOrWhiteSpace(appliedCouponCode) &&
+                             discountAmount > 0)
+                        {
+                            <div class="alert alert-success py-2 px-3 mt-3 mb-0 small">
+
+                                ✅ <strong>@appliedCouponCode</strong> applied.
+
+                                <br />
+
+                                You saved
+                                <strong>৳@discountAmount.ToString("N2")</strong>.
+
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Shipping
+                        </span>
+
+                        @if (shippingFee == 0)
+                        {
+                            <span class="text-success fw-semibold">
+                                FREE
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="fw-semibold">
+                                ৳@shippingFee.ToString("N2")
+                            </span>
+                        }
+
+                    </div>
+
+                    @if (discountAmount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span class="text-success">
+                                🎟️ Coupon Discount
+                            </span>
+
+                            <span class="text-success fw-semibold">
+                                -৳@discountAmount.ToString("N2")
+                            </span>
+
+                        </div>
+                    }
+                    <hr />
+
+
+                    <div class="d-flex justify-content-between
+                        align-items-center">
+
+                        <span class="fw-bold fs-5">
+                            Total
+                        </span>
+
+                        <span class="fw-bold fs-4 text-primary">
+                            ৳@total.ToString("N2")
+                        </span>
+
+                    </div>
+
+
+                    <div class="alert alert-light border mt-4 mb-0">
+
+                        <div class="small">
+
+                            🔒 <strong>Secure Payment</strong>
+
+                            <br />
+
+                            Your payment will be processed securely
+                            through SSLCOMMERZ.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const radios =
+                document.querySelectorAll(".address-radio");
+
+            radios.forEach(function(radio) {
+
+                radio.addEventListener("change", function() {
+
+                    document
+                        .querySelectorAll(".address-card")
+                        .forEach(function(card) {
+
+                            card.classList.remove("selected");
+
+                        });
+
+
+                    document
+                        .querySelectorAll(".select-address-text")
+                        .forEach(function(text) {
+
+                            text.textContent =
+                                "Select this address";
+
+                        });
+
+
+                    const selectedCard =
+                        this.closest("label")
+                            .querySelector(".address-card");
+
+                    const selectedText =
+                        this.closest("label")
+                            .querySelector(".select-address-text");
+
+
+                    selectedCard.classList.add("selected");
+
+                    selectedText.textContent =
+                        "✓ Selected";
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+
+    <style>
+
+        .address-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
+        }
+
+            .address-card:hover {
+                border-color: #0d6efd !important;
+                transform: translateY(-2px);
+                box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+            }
+
+            .address-card.selected {
+                border-color: #0d6efd !important;
+                box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+                background: #f8fbff;
+            }
+
+        .select-address-text {
+            color: #0d6efd;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+    </style>
+
+}

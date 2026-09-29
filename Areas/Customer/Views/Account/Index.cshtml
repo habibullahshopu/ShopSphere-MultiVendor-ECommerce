@@ -1,0 +1,238 @@
+﻿@model ShopSphere.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<div class="container py-5">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ✅ @TempData["Success"]
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">👤 My Account</h1>
+            <p class="text-muted mb-0">
+                Manage your ShopSphere account information.
+            </p>
+        </div>
+        <a asp-area="Customer"
+           asp-controller="Account"
+           asp-action="Edit"
+           class="btn btn-primary me-2">
+            ✏️ Edit Profile
+        </a>
+        <a asp-area="Customer"
+           asp-controller="Home"
+           asp-action="Index"
+           class="btn btn-outline-primary">
+            ← Customer Home
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Profile Information -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+                    <h4 class="fw-bold mb-0">Profile Information</h4>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">
+                                Full Name
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @(string.IsNullOrWhiteSpace(Model.FullName)
+                                    ? "Not provided"
+                                    : Model.FullName)
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">
+                                Email Address
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @Model.Email
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">
+                                Phone Number
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @(string.IsNullOrWhiteSpace(Model.PhoneNumber)
+                                    ? "Not provided"
+                                    : Model.PhoneNumber)
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">
+                                Account Status
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">
+                                Address
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @(string.IsNullOrWhiteSpace(Model.Address)
+                                    ? "Not provided"
+                                    : Model.Address)
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small">
+                                City
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @(string.IsNullOrWhiteSpace(Model.City)
+                                    ? "Not provided"
+                                    : Model.City)
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small">
+                                Postal Code
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @(string.IsNullOrWhiteSpace(Model.PostalCode)
+                                    ? "Not provided"
+                                    : Model.PostalCode)
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Account Overview -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">Account Overview</h5>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">Account Type</div>
+                        <div class="fw-semibold">
+                            Customer
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">Member Since</div>
+                        <div class="fw-semibold">
+                            @Model.CreatedAt.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-muted small">Vendor Status</div>
+
+                        @if (Model.IsVendor && Model.IsVendorApproved)
+                        {
+                            <span class="badge bg-success">
+                                Approved Vendor
+                            </span>
+                        }
+                        else if (Model.IsVendor)
+                        {
+                            <span class="badge bg-warning text-dark">
+                                Vendor Application Pending
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">
+                                Customer Only
+                            </span>
+                        }
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-3">Quick Actions</h5>
+
+                    <div class="d-grid gap-2">
+
+                        <a asp-area="Customer"
+                           asp-controller="Orders"
+                           asp-action="Index"
+                           class="btn btn-outline-primary">
+                            📦 My Orders
+                        </a>
+
+                        <a asp-area="Customer"
+                           asp-controller="Cart"
+                           asp-action="Index"
+                           class="btn btn-outline-primary">
+                            🛒 My Cart
+                        </a>
+
+                        <a asp-area="Customer"
+                           asp-controller="Products"
+                           asp-action="Index"
+                           class="btn btn-outline-primary">
+                            🛍️ Continue Shopping
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

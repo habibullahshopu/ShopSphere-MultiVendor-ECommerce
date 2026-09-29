@@ -1,0 +1,432 @@
+﻿@model ShopSphere.Models.Category
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<style>
+
+    .edit-category-page {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .edit-category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .edit-category-title h1 {
+        font-size: 42px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+
+    .edit-category-title p {
+        color: #64748b;
+        font-size: 17px;
+        margin: 0;
+    }
+
+    .btn-back-categories {
+        display: inline-block;
+        padding: 12px 20px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        color: #475569;
+        text-decoration: none;
+        font-weight: 600;
+        background: white;
+        transition: .2s;
+    }
+
+        .btn-back-categories:hover {
+            background: #f8fafc;
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+
+    .edit-category-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+        border: 1px solid #eef2f7;
+    }
+
+    .form-label-custom {
+        display: block;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 9px;
+        font-size: 16px;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        border: 1px solid #dbe3ef;
+        border-radius: 12px;
+        padding: 13px 15px;
+        font-size: 16px;
+        color: #334155;
+        outline: none;
+        transition: .2s;
+        background: #fff;
+    }
+
+        .form-control-custom:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+        }
+
+    textarea.form-control-custom {
+        min-height: 140px;
+        resize: vertical;
+    }
+
+    .category-image-preview {
+        margin-bottom: 18px;
+    }
+
+        .category-image-preview img {
+            width: 180px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            display: block;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, .08);
+        }
+
+    .category-image-preview-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+
+    .new-image-preview {
+        display: none;
+        margin-top: 15px;
+    }
+
+        .new-image-preview img {
+            width: 180px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid #bfdbfe;
+            display: block;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, .10);
+        }
+
+    .image-help-text {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 7px;
+    }
+
+    .form-check-custom {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 5px;
+        padding: 15px 18px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+        .form-check-custom input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .form-check-custom label {
+            margin: 0;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        flex-wrap: wrap;
+    }
+
+    .btn-update-category {
+        border: none;
+        padding: 13px 24px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+        transition: .2s;
+    }
+
+        .btn-update-category:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(37, 99, 235, .35);
+        }
+
+    .btn-cancel-category {
+        display: inline-block;
+        padding: 13px 24px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        text-decoration: none;
+        font-weight: 600;
+        background: white;
+        transition: .2s;
+    }
+
+        .btn-cancel-category:hover {
+            background: #f8fafc;
+            color: #dc2626;
+            border-color: #dc2626;
+        }
+
+    .validation-summary-errors {
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 12px;
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+
+    .field-validation-error {
+        color: #dc2626;
+        font-size: 14px;
+        margin-top: 6px;
+        display: block;
+    }
+
+    @@media (max-width: 768px) {
+
+        .edit-category-title h1 {
+            font-size: 32px;
+        }
+
+        .edit-category-card {
+            padding: 20px;
+        }
+    }
+
+</style>
+
+
+<div class="edit-category-page">
+
+    <div class="edit-category-header">
+
+        <div class="edit-category-title">
+            <h1>Edit Category ✏️</h1>
+            <p>Update your marketplace category information.</p>
+        </div>
+
+        <a asp-action="Index" class="btn-back-categories">
+            ← Back to Categories
+        </a>
+
+    </div>
+
+
+    <div class="edit-category-card">
+
+        <form asp-action="Edit"
+              method="post"
+              enctype="multipart/form-data">
+
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly"></div>
+
+
+            <div class="mb-4">
+
+                <label asp-for="Name" class="form-label-custom">
+                    Category Name
+                </label>
+
+                <input asp-for="Name"
+                       class="form-control-custom"
+                       placeholder="e.g. Electronics" />
+
+                <span asp-validation-for="Name"></span>
+
+            </div>
+
+
+            <div class="mb-4">
+
+                <label asp-for="Description" class="form-label-custom">
+                    Description
+                </label>
+
+                <textarea asp-for="Description"
+                          class="form-control-custom"
+                          placeholder="Enter category description"></textarea>
+
+                <span asp-validation-for="Description"></span>
+
+            </div>
+
+
+            <div class="mb-4">
+
+                <label class="form-label-custom">
+                    Category Image
+                </label>
+
+
+                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <div class="category-image-preview">
+
+                        <span class="category-image-preview-label">
+                            Current Image
+                        </span>
+
+                        <img src="@Model.ImageUrl"
+                             alt="@Model.Name" />
+
+                    </div>
+                }
+
+
+                <input type="file"
+                       name="imageFile"
+                       id="categoryImage"
+                       class="form-control-custom"
+                       accept=".jpg,.jpeg,.png,.webp" />
+
+
+                <div class="image-help-text">
+                    JPG, JPEG, PNG or WebP. Maximum file size: 5 MB.
+                </div>
+
+
+                <div id="newImagePreview" class="new-image-preview">
+
+                    <span class="category-image-preview-label">
+                        New Image Preview
+                    </span>
+
+                    <img id="newImagePreviewImage"
+                         src="#"
+                         alt="New category image preview" />
+
+                </div>
+
+            </div>
+
+
+            <div class="mb-4">
+
+                <div class="form-check-custom">
+
+                    <input asp-for="IsActive" />
+
+                    <label asp-for="IsActive">
+                        Active Category
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button type="submit" class="btn-update-category">
+                    💾 Update Category
+                </button>
+
+                <a asp-action="Index" class="btn-cancel-category">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        const categoryImage = document.getElementById("categoryImage");
+        const newImagePreview = document.getElementById("newImagePreview");
+        const newImagePreviewImage = document.getElementById("newImagePreviewImage");
+
+        categoryImage.addEventListener("change", function() {
+
+            const file = this.files[0];
+
+            if (!file) {
+                newImagePreview.style.display = "none";
+                newImagePreviewImage.src = "#";
+                return;
+            }
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            const maxSize = 5 * 1024 * 1024;
+
+            if (!allowedTypes.includes(file.type)) {
+                alert("Please select a JPG, JPEG, PNG or WebP image.");
+                this.value = "";
+                newImagePreview.style.display = "none";
+                newImagePreviewImage.src = "#";
+                return;
+            }
+
+            if (file.size > maxSize) {
+                alert("Image size must be 5 MB or less.");
+                this.value = "";
+                newImagePreview.style.display = "none";
+                newImagePreviewImage.src = "#";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+
+                newImagePreviewImage.src = event.target.result;
+                newImagePreview.style.display = "block";
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+    </script>
+}

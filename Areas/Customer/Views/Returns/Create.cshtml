@@ -1,0 +1,143 @@
+﻿@model ShopSphere.Models.ReturnRequest
+
+@{
+    ViewData["Title"] = "Request Return";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="mb-4">
+                <h2 class="fw-bold">Request a Return</h2>
+                <p class="text-muted">
+                    Submit a return request for Order #@Model.OrderId
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <form asp-action="Create" method="post">
+
+                        <input type="hidden"
+                               asp-for="OrderId" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Reason"
+                                   class="form-label fw-semibold">
+                                Return Reason
+                            </label>
+
+                            <select asp-for="Reason"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Select a reason
+                                </option>
+
+                                <option value="Damaged Product">
+                                    Damaged Product
+                                </option>
+
+                                <option value="Wrong Product">
+                                    Wrong Product
+                                </option>
+
+                                <option value="Product Not as Described">
+                                    Product Not as Described
+                                </option>
+
+                                <option value="Defective Product">
+                                    Defective Product
+                                </option>
+
+                                <option value="Missing Items">
+                                    Missing Items
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="Reason"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description"
+                                   class="form-label fw-semibold">
+                                Additional Details
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Please describe the problem with your order..."></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="alert alert-light border rounded-3">
+
+                            <div class="d-flex justify-content-between">
+                                <span>Expected Refund Amount</span>
+
+                                <strong>
+                                    ৳@Model.RefundAmount.ToString("N2")
+                                </strong>
+                            </div>
+
+                            <small class="text-muted">
+                                Final refund amount will be confirmed
+                                after return review.
+                            </small>
+
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+
+                            <a asp-area="Customer"
+                               asp-controller="Orders"
+                               asp-action="Details"
+                               asp-route-id="@Model.OrderId"
+                               class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-dark px-4">
+                                <i class="bi bi-arrow-return-left me-1"></i>
+                                Submit Return Request
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

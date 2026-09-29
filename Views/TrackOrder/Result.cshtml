@@ -1,0 +1,264 @@
+﻿@model ShopSphere.Models.Order
+@using ShopSphere.Helpers
+@{
+    ViewData["Title"] = "Track Order";
+}
+
+<div class="container py-5">
+
+    <div class="text-center mb-4">
+        <div style="font-size:48px;">📦</div>
+
+        <h1 class="fw-bold mb-2">
+            Order Tracking
+        </h1>
+
+        <p class="text-muted">
+            Track the current status of your ShopSphere order.
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+                        <div>
+                            <small class="text-muted">
+                                Order Number
+                            </small>
+
+                            <h3 class="fw-bold mb-0">
+                                #@Model.Id
+                            </h3>
+                        </div>
+
+                        <div class="text-end">
+                            <small class="text-muted">
+                                Order Date
+                            </small>
+
+                            <div class="fw-semibold">
+                                @BangladeshTimeHelper.ToBangladeshTime(Model.CreatedAt).ToString("dd MMM yyyy, hh:mm tt")
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <small class="text-muted d-block mb-1">
+                                    Order Status
+                                </small>
+                                @{
+                                    var statusBadgeClass = Model.Status switch
+                                    {
+                                        "Pending" => "bg-warning text-dark",
+                                        "Processing" => "bg-info text-dark",
+                                        "Shipped" => "bg-primary",
+                                        "Delivered" => "bg-success",
+                                        "Cancelled" => "bg-danger",
+                                        "Refunded" => "bg-success",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+
+                                <span class="badge @statusBadgeClass">
+                                    @Model.Status
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <small class="text-muted d-block mb-1">
+                                    Payment
+                                </small>
+
+                                <span class="badge bg-success">
+                                    @Model.PaymentStatus
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded-3 h-100">
+                                <small class="text-muted d-block mb-1">
+                                    Total Amount
+                                </small>
+
+                                <strong class="text-primary">
+                                    ৳@Model.TotalAmount.ToString("N2")
+                                </strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    @{
+                        var currentStatus = Model.Status?.Trim() ?? "Pending";
+
+                        var statusOrder = new[]
+                        {
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered"
+    };
+
+                        var currentIndex = Array.IndexOf(statusOrder, currentStatus);
+                    }
+
+                    <h5 class="fw-bold mb-4">
+                        📍 Order Progress
+                    </h5>
+
+                    @if (currentStatus == "Cancelled")
+                    {
+                        <div class="alert alert-danger rounded-3">
+                            <strong>❌ Order Cancelled</strong>
+                            <div class="small mt-1">
+                                This order has been cancelled.
+                            </div>
+                        </div>
+                    }
+                    else if (currentStatus == "Refunded")
+                    {
+                        <div class="alert alert-success rounded-3">
+                            <strong>💰 Refund Completed</strong>
+                            <div class="small mt-1">
+                                This order has been refunded successfully.
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <div class="text-center p-3 border rounded-3 h-100
+                                    @(currentIndex >= 0 ? "border-primary bg-light" : "")">
+
+                                    <div style="font-size:30px;">
+                                        @(currentIndex >= 0 ? "✅" : "📝")
+                                    </div>
+
+                                    <strong>Order Placed</strong>
+
+                                    <small class="text-muted d-block">
+                                        Your order has been received.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="text-center p-3 border rounded-3 h-100
+                                    @(currentIndex >= 1 ? "border-primary bg-light" : "")">
+
+                                    <div style="font-size:30px;">
+                                        @(currentIndex >= 1 ? "✅" : "⚙️")
+                                    </div>
+
+                                    <strong>Processing</strong>
+
+                                    <small class="text-muted d-block">
+                                        Your order is being prepared.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="text-center p-3 border rounded-3 h-100
+                                    @(currentIndex >= 2 ? "border-primary bg-light" : "")">
+
+                                    <div style="font-size:30px;">
+                                        @(currentIndex >= 2 ? "✅" : "🚚")
+                                    </div>
+
+                                    <strong>Shipped</strong>
+
+                                    <small class="text-muted d-block">
+                                        Your order is on the way.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="text-center p-3 border rounded-3 h-100
+                                    @(currentIndex >= 3 ? "border-primary bg-light" : "")">
+
+                                    <div style="font-size:30px;">
+                                        @(currentIndex >= 3 ? "✅" : "📦")
+                                    </div>
+
+                                    <strong>Delivered</strong>
+
+                                    <small class="text-muted d-block">
+                                        Order successfully delivered.
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+
+                    @if (Model.OrderItems != null && Model.OrderItems.Any())
+                    {
+                        <hr class="my-4" />
+
+                        <h5 class="fw-bold mb-3">
+                            🛍️ Order Items
+                        </h5>
+
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+                                <div>
+                                    <strong>
+                                        @(item.Product?.Name ?? "Product")
+                                    </strong>
+
+                                    <small class="text-muted d-block">
+                                        Quantity: @item.Quantity
+                                    </small>
+                                </div>
+
+                                <strong>
+                                    ৳@item.Subtotal.ToString("N2")
+                                </strong>
+
+                            </div>
+                        }
+                    }
+
+                    <div class="d-flex justify-content-center gap-2 flex-wrap mt-4">
+
+                        <a asp-controller="TrackOrder"
+                           asp-action="Index"
+                           class="btn btn-outline-primary rounded-3">
+                            🔍 Track Another Order
+                        </a>
+
+                        <a asp-controller="Home"
+                           asp-action="Index"
+                           class="btn btn-primary rounded-3">
+                            🏠 Back to Home
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

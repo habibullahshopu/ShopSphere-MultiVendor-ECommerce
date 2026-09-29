@@ -1,0 +1,201 @@
+﻿@model IEnumerable<ShopSphere.Areas.Admin.Controllers.UserViewModel>
+
+@{
+    ViewData["Title"] = "Users";
+    var search = ViewBag.Search as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="fw-bold mb-2">Users 👥</h1>
+        <p class="text-muted mb-0">
+            Manage all registered marketplace users from one place.
+        </p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">All Users</h3>
+                <p class="text-muted mb-0">
+                    Total: @Model.Count() user(s)
+                </p>
+            </div>
+
+            <form asp-area="Admin"
+                  asp-controller="Users"
+                  asp-action="Index"
+                  method="get"
+                  class="d-flex gap-2">
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       class="form-control"
+                       style="width: 280px;"
+                       placeholder="🔎 Search users..." />
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    Search
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(search))
+                {
+                    <a asp-area="Admin"
+                       asp-controller="Users"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Clear
+                    </a>
+                }
+            </form>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            int count = 1;
+                        }
+
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@count</td>
+
+                                <td>
+                                    <div class="fw-bold">
+                                        @(string.IsNullOrWhiteSpace(user.FullName)
+                                            ? "Not Provided"
+                                            : user.FullName)
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @(user.Email ?? "No Email")
+                                </td>
+
+                                <td>
+                                    @(user.UserName ?? "No Username")
+                                </td>
+
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success px-3 py-2">
+                                            ● Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary px-3 py-2">
+                                            ● Inactive
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @user.CreatedAt.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td class="text-end">
+                                    <form asp-area="Admin"
+                                          asp-controller="Users"
+                                          asp-action="ToggleStatus"
+                                          method="post"
+                                          class="d-inline">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@user.Id" />
+
+                                        @if (user.IsActive)
+                                        {
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Are you sure you want to deactivate this user?');">
+                                                🔒 Deactivate
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-success"
+                                                    onclick="return confirm('Are you sure you want to activate this user?');">
+                                                🔓 Activate
+                                            </button>
+                                        }
+
+                                    </form>
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <div style="font-size: 60px;">👥</div>
+
+                <h3 class="fw-bold mt-3">
+                    @if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        <text>No matching users found</text>
+                    }
+                    else
+                    {
+                        <text>No users found</text>
+                    }
+                </h3>
+
+                <p class="text-muted">
+                    @if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        <text>Try searching with a different name, email or username.</text>
+                    }
+                    else
+                    {
+                        <text>Registered users will appear here.</text>
+                    }
+                </p>
+
+                @if (!string.IsNullOrWhiteSpace(search))
+                {
+                    <a asp-area="Admin"
+                       asp-controller="Users"
+                       asp-action="Index"
+                       class="btn btn-outline-primary">
+                        ← View All Users
+                    </a>
+                }
+            </div>
+        }
+
+    </div>
+</div>

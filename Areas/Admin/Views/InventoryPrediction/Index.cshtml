@@ -1,0 +1,471 @@
+﻿@model List<ShopSphere.Services.InventoryPredictionResult>?
+
+@{
+    ViewData["Title"] = "AI Inventory Prediction";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+        <div>
+            <h1 class="fw-bold mb-1">
+                🤖 AI Inventory Prediction
+            </h1>
+
+            <p class="text-muted mb-0">
+                AI-powered inventory risk and restocking forecast
+                based on recent product sales.
+            </p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- MESSAGE -->
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-warning border-0 shadow-sm rounded-4">
+            ⚠️ @ViewBag.Message
+        </div>
+    }
+
+
+    <!-- GENERATE SECTION -->
+    @if (Model == null && ViewBag.Message == null)
+    {
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+            <div class="card-body p-5 text-center">
+
+                <div class="mb-3" style="font-size: 3rem;">
+                    📦
+                </div>
+
+                <h3 class="fw-bold mb-2">
+                    AI Inventory Analysis Ready
+                </h3>
+
+                <p class="text-muted mb-4">
+                    Analyze current stock and recent sales data
+                    to identify products that may need restocking.
+                </p>
+
+                <form asp-area="Admin"
+                      asp-controller="InventoryPrediction"
+                      asp-action="Generate"
+                      method="post"
+                      id="inventoryPredictionForm">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn btn-primary btn-lg px-4"
+                            id="generateInventoryButton">
+
+                        🤖 Generate AI Prediction
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- PREDICTION SUMMARY -->
+    @if (Model != null && Model.Count > 0)
+    {
+        var highRiskCount =
+            Model.Count(x =>
+                string.Equals(
+                    x.RiskLevel,
+                    "High",
+                    StringComparison.OrdinalIgnoreCase));
+
+        var mediumRiskCount =
+            Model.Count(x =>
+                string.Equals(
+                    x.RiskLevel,
+                    "Medium",
+                    StringComparison.OrdinalIgnoreCase));
+
+        var lowRiskCount =
+            Model.Count(x =>
+                string.Equals(
+                    x.RiskLevel,
+                    "Low",
+                    StringComparison.OrdinalIgnoreCase));
+
+        <div class="row g-4 mb-4">
+
+            <!-- HIGH RISK -->
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body p-4">
+
+                        <div class="text-muted mb-2">
+                            🔴 High Risk
+                        </div>
+
+                        <h2 class="fw-bold text-danger mb-0">
+                            @highRiskCount
+                        </h2>
+
+                        <small class="text-muted">
+                            Products requiring urgent attention
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MEDIUM RISK -->
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body p-4">
+
+                        <div class="text-muted mb-2">
+                            🟡 Medium Risk
+                        </div>
+
+                        <h2 class="fw-bold text-warning mb-0">
+                            @mediumRiskCount
+                        </h2>
+
+                        <small class="text-muted">
+                            Products worth monitoring
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOW RISK -->
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body p-4">
+
+                        <div class="text-muted mb-2">
+                            🟢 Low Risk
+                        </div>
+
+                        <h2 class="fw-bold text-success mb-0">
+                            @lowRiskCount
+                        </h2>
+
+                        <small class="text-muted">
+                            Products with lower stock risk
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTION BAR -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between
+                    align-items-center
+                    flex-wrap gap-3">
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            📊 Inventory Prediction Results
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            AI analysis based on the last 30 days
+                            of paid sales data.
+                        </p>
+                    </div>
+
+                    <form asp-area="Admin"
+                          asp-controller="InventoryPrediction"
+                          asp-action="Generate"
+                          method="post"
+                          class="inventory-prediction-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            🤖 Generate Again
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PREDICTION TABLE -->
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-4">
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Product
+                                </th>
+
+                                <th>
+                                    Current Stock
+                                </th>
+
+                                <th>
+                                    Daily Sales
+                                </th>
+
+                                <th>
+                                    Stockout
+                                </th>
+
+                                <th>
+                                    Risk
+                                </th>
+
+                                <th>
+                                    Recommended Restock
+                                </th>
+
+                                <th>
+                                    AI Explanation
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                var riskClass =
+                                    item.RiskLevel
+                                        .ToLowerInvariant() switch
+                                    {
+                                        "high" => "bg-danger",
+                                        "medium" => "bg-warning text-dark",
+                                        "low" => "bg-success",
+                                        _ => "bg-secondary"
+                                    };
+
+                                var rowClass =
+                                item.RiskLevel
+          .ToLowerInvariant() switch
+      {
+          "high" => "table-danger",
+          "medium" => "table-warning",
+          "low" => "table-success",
+          _ => ""
+      };
+
+                                <tr class="@rowClass">
+
+                                    <!-- PRODUCT -->
+                                    <td>
+
+                                        <div class="fw-semibold">
+                                            @item.ProductName
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- CURRENT STOCK -->
+                                    <td>
+
+                                        <span class="fw-semibold">
+                                            @item.CurrentStock
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- DAILY SALES -->
+                                    <td>
+
+                                        @item.PredictedDailySales
+
+                                        <small class="text-muted">
+                                            / day
+                                        </small>
+
+                                    </td>
+
+
+                                    <!-- STOCKOUT -->
+                                    <td>
+
+                                        @if (item.PredictedDailySales > 0)
+                                        {
+                                            <span>
+                                                @item.EstimatedDaysUntilStockout
+                                                days
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No recent sales
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- RISK -->
+                                    <td>
+
+                                        <span class="badge @riskClass px-3 py-2">
+                                            @item.RiskLevel
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- RESTOCK -->
+                                    <td>
+
+                                        @if (item.RecommendedRestockQuantity > 0)
+                                        {
+                                            <span class="fw-semibold">
+                                                @item.RecommendedRestockQuantity
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                —
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- EXPLANATION -->
+                                    <td style="min-width: 280px;">
+
+                                        <span class="text-muted">
+                                            @item.Explanation
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- NO RESULT -->
+    @if (Model != null && Model.Count == 0)
+    {
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-5 text-center">
+
+                <div class="mb-3" style="font-size: 3rem;">
+                    📦
+                </div>
+
+                <h4 class="fw-bold">
+                    No Inventory Data
+                </h4>
+
+                <p class="text-muted mb-0">
+                    There are currently no active products
+                    available for inventory prediction.
+                </p>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const forms = document.querySelectorAll(
+            ".inventory-prediction-form, #inventoryPredictionForm"
+        );
+
+        forms.forEach(function(form) {
+
+            form.addEventListener("submit", function() {
+
+                const button = form.querySelector(
+                    'button[type="submit"]'
+                );
+
+                if (!button) {
+                    return;
+                }
+
+                button.disabled = true;
+
+                button.innerHTML =
+                    "⏳ Generating Inventory Prediction...";
+
+            });
+
+        });
+
+    });
+
+</script>

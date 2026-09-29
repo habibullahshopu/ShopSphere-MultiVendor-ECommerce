@@ -1,0 +1,580 @@
+﻿@model ShopSphere.Controllers.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<style>
+
+    /* =========================
+           REGISTER PAGE
+        ========================== */
+
+    .register-page {
+        min-height: 78vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 15px;
+    }
+
+
+    .register-wrapper {
+        width: 100%;
+        max-width: 540px;
+    }
+
+
+    /* =========================
+           REGISTER CARD
+        ========================== */
+
+    .register-card {
+        background: white;
+        border-radius: 22px;
+        padding: 40px;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+        border: 1px solid #e5e7eb;
+    }
+
+
+    /* =========================
+           BRAND
+        ========================== */
+
+    .register-brand {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+
+    .register-brand-icon {
+        font-size: 48px;
+        margin-bottom: 8px;
+    }
+
+
+    .register-brand h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+
+    .register-brand p {
+        color: #64748b;
+        margin: 0;
+    }
+
+
+    /* =========================
+           LABEL
+        ========================== */
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+
+    /* =========================
+           FORM INPUT
+        ========================== */
+
+    .form-control-custom {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #cbd5e1;
+        border-radius: 11px;
+        outline: none;
+        font-size: 16px;
+        transition: .2s;
+        background: white;
+    }
+
+
+        .form-control-custom:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+        }
+
+
+    /* =========================
+           PASSWORD WRAPPER
+        ========================== */
+
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+
+    .password-input {
+        padding-right: 55px;
+    }
+
+
+    /* =========================
+           SHOW PASSWORD BUTTON
+        ========================== */
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 20px;
+        color: #64748b;
+        padding: 6px;
+        border-radius: 6px;
+        transition: .2s;
+    }
+
+
+        .password-toggle:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+
+    /* =========================
+           PASSWORD HELP TEXT
+        ========================== */
+
+    .password-note {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 7px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================
+           REGISTER BUTTON
+        ========================== */
+
+    .register-btn {
+        width: 100%;
+        border: none;
+        border-radius: 11px;
+        padding: 14px;
+        background: linear-gradient( 135deg, #2563eb, #1d4ed8 );
+        color: white;
+        font-size: 17px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, .22);
+        transition: .2s;
+        cursor: pointer;
+    }
+
+
+        .register-btn:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, .30);
+        }
+
+
+    /* =========================
+           LOGIN LINK
+        ========================== */
+
+    .login-link {
+        text-align: center;
+        margin-top: 22px;
+        color: #64748b;
+    }
+
+
+        .login-link a {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+
+            .login-link a:hover {
+                text-decoration: underline;
+            }
+
+
+    /* =========================
+           VALIDATION
+        ========================== */
+
+    .validation-summary {
+        border-radius: 10px;
+        padding: 12px 15px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================
+           RESPONSIVE
+        ========================== */
+
+    @@media (max-width: 576px) {
+
+        .register-page {
+            padding: 25px 12px;
+        }
+
+
+        .register-card {
+            padding: 25px 20px;
+        }
+
+
+        .register-brand h1 {
+            font-size: 28px;
+        }
+    }
+
+</style>
+
+
+<!-- =====================================
+     REGISTER PAGE
+====================================== -->
+
+<div class="register-page">
+
+    <div class="register-wrapper">
+
+        <div class="register-card">
+
+
+            <!-- =========================
+                 HEADER
+            ========================== -->
+
+            <div class="register-brand">
+
+                <div class="register-brand-icon">
+                    🛍️
+                </div>
+
+                <h1>
+                    Create Your Account
+                </h1>
+
+                <p>
+                    Join ShopSphere and start shopping today.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 REGISTER FORM
+            ========================== -->
+
+            <form asp-action="Register"
+                  asp-controller="Account"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- Validation -->
+
+                <div asp-validation-summary="ModelOnly"
+                     class="validation-summary">
+                </div>
+
+
+                <!-- =========================
+                     FULL NAME
+                ========================== -->
+
+                <div class="mb-4">
+
+                    <label asp-for="FullName"
+                           class="form-label form-label-custom">
+
+                        Full Name
+
+                    </label>
+
+
+                    <input asp-for="FullName"
+                           class="form-control-custom"
+                           placeholder="e.g. Habibullah Shopu" />
+
+
+                    <span asp-validation-for="FullName"
+                          class="text-danger">
+
+                    </span>
+
+                </div>
+
+
+                <!-- =========================
+                     EMAIL
+                ========================== -->
+
+                <div class="mb-4">
+
+                    <label asp-for="Email"
+                           class="form-label form-label-custom">
+
+                        Email Address
+
+                    </label>
+
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control-custom"
+                           placeholder="you@example.com" />
+
+
+                    <span asp-validation-for="Email"
+                          class="text-danger">
+
+                    </span>
+
+                </div>
+
+
+                <!-- =========================
+                     PASSWORD
+                ========================== -->
+
+                <div class="mb-4">
+
+                    <label asp-for="Password"
+                           class="form-label form-label-custom">
+
+                        Password
+
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+                        <input asp-for="Password"
+                               id="passwordInput"
+                               type="password"
+                               class="form-control-custom password-input"
+                               placeholder="Enter your password" />
+
+
+                        <button type="button"
+                                class="password-toggle"
+                                id="passwordToggle"
+                                aria-label="Show password">
+
+                            <span id="passwordIcon">
+                                👁️
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="password-note">
+
+                        Minimum 6 characters with
+                        uppercase, lowercase and a number.
+
+                    </div>
+
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+
+                    </span>
+
+                </div>
+
+
+                <!-- =========================
+                     CONFIRM PASSWORD
+                ========================== -->
+
+                <div class="mb-4">
+
+                    <label asp-for="ConfirmPassword"
+                           class="form-label form-label-custom">
+
+                        Confirm Password
+
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+                        <input asp-for="ConfirmPassword"
+                               id="confirmPasswordInput"
+                               type="password"
+                               class="form-control-custom password-input"
+                               placeholder="Re-enter your password" />
+
+
+                        <button type="button"
+                                class="password-toggle"
+                                id="confirmPasswordToggle"
+                                aria-label="Show password">
+
+                            <span id="confirmPasswordIcon">
+                                👁️
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger">
+
+                    </span>
+
+                </div>
+
+
+                <!-- =========================
+                     REGISTER BUTTON
+                ========================== -->
+
+                <button type="submit"
+                        class="register-btn">
+
+                    Create Account
+
+                </button>
+
+
+                <!-- =========================
+                     LOGIN LINK
+                ========================== -->
+
+                <div class="login-link">
+
+                    Already have an account?
+
+                    <a asp-area="Identity"
+                       asp-page="/Account/Login">
+
+                        Login
+
+                    </a>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+
+        // =========================================
+        // PASSWORD SHOW / HIDE
+        // =========================================
+
+        document
+            .getElementById("passwordToggle")
+            ?.addEventListener("click", function() {
+
+                const input =
+                    document.getElementById("passwordInput");
+
+                const icon =
+                    document.getElementById("passwordIcon");
+
+
+                if (input.type === "password") {
+
+                    input.type = "text";
+
+                    icon.textContent = "🙈";
+
+                    this.setAttribute(
+                        "aria-label",
+                        "Hide password"
+                    );
+
+                }
+                else {
+
+                    input.type = "password";
+
+                    icon.textContent = "👁️";
+
+                    this.setAttribute(
+                        "aria-label",
+                        "Show password"
+                    );
+
+                }
+
+            });
+
+
+        // =========================================
+        // CONFIRM PASSWORD SHOW / HIDE
+        // =========================================
+
+        document
+            .getElementById("confirmPasswordToggle")
+            ?.addEventListener("click", function() {
+
+                const input =
+                    document.getElementById("confirmPasswordInput");
+
+                const icon =
+                    document.getElementById("confirmPasswordIcon");
+
+
+                if (input.type === "password") {
+
+                    input.type = "text";
+
+                    icon.textContent = "🙈";
+
+                    this.setAttribute(
+                        "aria-label",
+                        "Hide password"
+                    );
+
+                }
+                else {
+
+                    input.type = "password";
+
+                    icon.textContent = "👁️";
+
+                    this.setAttribute(
+                        "aria-label",
+                        "Show password"
+                    );
+
+                }
+
+            });
+
+    </script>
+
+}

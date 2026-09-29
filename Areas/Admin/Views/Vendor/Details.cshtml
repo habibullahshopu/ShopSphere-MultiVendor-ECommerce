@@ -1,0 +1,270 @@
+﻿@model ShopSphere.ViewModels.AdminVendorViewModel
+
+@{
+    ViewData["Title"] = "Vendor Details";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Vendor Details</h2>
+            <p class="text-muted mb-0">
+                Review vendor application information.
+            </p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Vendor"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Back to Vendors
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Store Information -->
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">🏪 Store Information</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-4">
+                        <label class="text-muted small">
+                            Store Name
+                        </label>
+
+                        <h4 class="mb-0">
+                            @Model.StoreName
+                        </h4>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small">
+                            Store Description
+                        </label>
+
+                        <p class="mb-0">
+                            @(string.IsNullOrWhiteSpace(Model.StoreDescription)
+                                ? "No description provided."
+                                : Model.StoreDescription)
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small">
+                            Store Address
+                        </label>
+
+                        <p class="mb-0">
+                            @(string.IsNullOrWhiteSpace(Model.StoreAddress)
+                                ? "Not provided."
+                                : Model.StoreAddress)
+                        </p>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">
+                                City
+                            </label>
+
+                            <div class="fw-semibold">
+                                @(Model.City ?? "N/A")
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">
+                                Country
+                            </label>
+
+                            <div class="fw-semibold">
+                                @(Model.Country ?? "N/A")
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <label class="text-muted small">
+                                Commission Rate
+                            </label>
+
+                            <div>
+                                <span class="badge bg-info text-dark fs-6">
+                                    @Model.CommissionRate.ToString("0.00")%
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="text-muted small">
+                                Application Date
+                            </label>
+
+                            <div class="fw-semibold">
+                                @Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, hh:mm tt")
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Vendor Account Information -->
+        <div class="col-lg-5">
+
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">👤 Vendor Account</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <label class="text-muted small">
+                            Full Name
+                        </label>
+
+                        <div class="fw-semibold">
+                            @(Model.FullName ?? "N/A")
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">
+                            Email
+                        </label>
+
+                        <div class="fw-semibold">
+                            @(Model.Email ?? "N/A")
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">
+                            Phone Number
+                        </label>
+
+                        <div class="fw-semibold">
+                            @(Model.PhoneNumber ?? "N/A")
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-muted small">
+                            User ID
+                        </label>
+
+                        <div class="small text-break">
+                            @Model.UserId
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Status -->
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header">
+                    <h5 class="mb-0">📋 Application Status</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        @if (Model.IsApproved && Model.IsActive)
+                        {
+                            <span class="badge bg-success fs-6">
+                                Approved & Active
+                            </span>
+                        }
+                        else if (!Model.IsApproved && Model.IsActive)
+                        {
+                            <span class="badge bg-warning text-dark fs-6">
+                                Pending Approval
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6">
+                                Rejected / Inactive
+                            </span>
+                        }
+
+                    </div>
+
+                  @if (Model.ApprovedAt.HasValue)
+{
+    <div class="text-muted small mb-3">
+        Approved on:
+        @(Model.ApprovedAt.Value.ToLocalTime().ToString("dd MMMM yyyy, hh:mm tt"))
+    </div>
+}
+
+                    @if (!Model.IsApproved && Model.IsActive)
+                    {
+                        <div class="d-flex gap-2">
+
+                            <form asp-area="Admin"
+                                  asp-controller="Vendor"
+                                  asp-action="Approve"
+                                  asp-route-id="@Model.Id"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-success"
+                                        onclick="return confirm('Approve this vendor?');">
+                                    ✅ Approve Vendor
+                                </button>
+
+                            </form>
+
+                            <form asp-area="Admin"
+                                  asp-controller="Vendor"
+                                  asp-action="Reject"
+                                  asp-route-id="@Model.Id"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-danger"
+                                        onclick="return confirm('Reject this vendor?');">
+                                    ❌ Reject
+                                </button>
+
+                            </form>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

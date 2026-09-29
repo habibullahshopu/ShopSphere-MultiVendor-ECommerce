@@ -1,0 +1,1029 @@
+﻿@model ShopSphere.Models.Product
+
+@using Microsoft.AspNetCore.Identity
+@using ShopSphere.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Product Details";
+
+    var reviews = ViewBag.Reviews as List<ProductReview>
+        ?? new List<ProductReview>();
+
+    var reviewCount = ViewBag.ReviewCount is int rc
+        ? rc
+        : 0;
+
+    var averageRating = ViewBag.AverageRating is double avg
+        ? avg
+        : Convert.ToDouble(ViewBag.AverageRating ?? 0);
+
+    var rating5Count = ViewBag.Rating5Count is int r5
+        ? r5
+        : 0;
+
+    var rating4Count = ViewBag.Rating4Count is int r4
+        ? r4
+        : 0;
+
+    var rating3Count = ViewBag.Rating3Count is int r3
+        ? r3
+        : 0;
+
+    var rating2Count = ViewBag.Rating2Count is int r2
+        ? r2
+        : 0;
+
+    var rating1Count = ViewBag.Rating1Count is int r1
+        ? r1
+        : 0;
+
+    var currentUser = await UserManager.GetUserAsync(User);
+
+    var currentUserReview = currentUser != null
+        ? reviews.FirstOrDefault(r => r.UserId == currentUser.Id)
+        : null;
+
+    string GetStars(double rating)
+    {
+        var rounded = (int)Math.Round(
+            rating,
+            MidpointRounding.AwayFromZero);
+
+        rounded = Math.Max(0, Math.Min(5, rounded));
+
+        return new string('★', rounded) +
+               new string('☆', 5 - rounded);
+    }
+
+    int GetPercentage(int count)
+    {
+        if (reviewCount == 0)
+            return 0;
+
+        return (int)Math.Round(
+            count * 100.0 / reviewCount);
+    }
+}
+
+<style>
+    .product-details-image {
+        height: 450px;
+        object-fit: cover;
+    }
+
+    .rating-summary-card {
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        background: #ffffff;
+    }
+
+    .average-rating {
+        font-size: 4rem;
+        line-height: 1;
+        font-weight: 800;
+    }
+
+    .rating-stars {
+        color: #ffc107;
+        letter-spacing: 2px;
+        font-size: 1.3rem;
+    }
+
+    .rating-bar {
+        height: 8px;
+        border-radius: 10px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .rating-bar-fill {
+        height: 100%;
+        border-radius: 10px;
+        background: #ffc107;
+    }
+
+    .review-card {
+        border: 1px solid #e9ecef;
+        border-radius: 18px;
+        background: #ffffff;
+        transition: 0.2s ease;
+    }
+
+        .review-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+            transform: translateY(-1px);
+        }
+
+    .review-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #0d6efd;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .review-form-card {
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        background: #f8f9fa;
+    }
+
+    .star-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 4px;
+    }
+
+        .star-input input {
+            display: none;
+        }
+
+        .star-input label {
+            cursor: pointer;
+            font-size: 2rem;
+            color: #ced4da;
+            transition: 0.15s ease;
+        }
+
+            .star-input label:hover,
+            .star-input label:hover ~ label,
+            .star-input input:checked ~ label {
+                color: #ffc107;
+            }
+
+    .empty-reviews {
+        border: 1px dashed #ced4da;
+        border-radius: 18px;
+        background: #f8f9fa;
+    }
+
+    .product-action-btn {
+        min-height: 52px;
+    }
+
+    @@media (max-width: 767.98px) {
+        .product-details-image {
+            height: 320px;
+        }
+
+        .average-rating {
+            font-size: 3rem;
+        }
+    }
+</style>
+
+<div class="container py-5">
+
+    <!-- Back -->
+    <div class="mb-4">
+        <a asp-area="Customer"
+           asp-controller="Products"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Back to Products
+        </a>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- PRODUCT DETAILS -->
+    <!-- ========================================================= -->
+
+    <div class="row g-5">
+
+        <!-- Product Image -->
+        <div class="col-lg-6">
+
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <div class="border rounded-4 p-3 bg-white shadow-sm">
+
+                    <img src="@Model.ImageUrl"
+                         alt="@Model.Name"
+                         class="img-fluid rounded-3 w-100 product-details-image" />
+
+                </div>
+            }
+            else
+            {
+                <div class="border rounded-4 bg-light d-flex align-items-center justify-content-center shadow-sm"
+                     style="height:450px; font-size:100px;">
+                    📦
+                </div>
+            }
+
+        </div>
+
+
+        <!-- Product Information -->
+        <div class="col-lg-6">
+
+            <!-- Category -->
+            <div class="mb-3">
+                <span class="badge bg-light text-dark border px-3 py-2">
+                    📁 @(Model.Category?.Name ?? "Uncategorized")
+                </span>
+            </div>
+
+
+            <!-- Product Name -->
+            <h1 class="fw-bold mb-3">
+                @Model.Name
+            </h1>
+
+
+            <!-- Rating Quick Summary -->
+            <div class="d-flex align-items-center gap-2 mb-3">
+
+                <span class="rating-stars">
+                    @GetStars(averageRating)
+                </span>
+
+                <span class="fw-semibold">
+                    @averageRating.ToString("0.0")
+                </span>
+
+                <span class="text-muted">
+                    (@reviewCount @(reviewCount == 1 ? "review" : "reviews"))
+                </span>
+
+            </div>
+
+
+            <!-- Price -->
+            <div class="fs-2 fw-bold text-primary mb-4">
+                ৳ @Model.Price.ToString("N2")
+            </div>
+
+
+            <!-- Description -->
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <div class="mb-4">
+
+                    <h5 class="fw-bold">
+                        Description
+                    </h5>
+
+                    <p class="text-muted">
+                        @Model.Description
+                    </p>
+
+                </div>
+            }
+
+
+            <!-- Stock -->
+            <div class="mb-4">
+
+                @if (Model.StockQuantity <= 10)
+                {
+                    <span class="badge bg-warning text-dark px-3 py-2">
+                        ⚠️ Only @Model.StockQuantity left
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-success px-3 py-2">
+                        ✅ @Model.StockQuantity items in stock
+                    </span>
+                }
+
+            </div>
+
+
+            <!-- Add To Cart -->
+            <form asp-area="Customer"
+                  asp-controller="Cart"
+                  asp-action="AddToCart"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="productId"
+                       value="@Model.Id" />
+
+                <div class="mb-4">
+
+                    <label for="quantity"
+                           class="form-label fw-semibold">
+                        Quantity
+                    </label>
+
+                    <div class="d-flex gap-2">
+
+                        <input type="number"
+                               id="quantity"
+                               name="quantity"
+                               class="form-control"
+                               value="1"
+                               min="1"
+                               max="@Model.StockQuantity"
+                               style="max-width:150px;" />
+
+                        <button type="submit"
+                                class="btn btn-primary btn-lg px-4 product-action-btn">
+                            🛒 Add to Cart
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+
+            <!-- Wishlist -->
+            <form asp-area="Customer"
+                  asp-controller="Wishlist"
+                  asp-action="Add"
+                  method="post"
+                  class="mb-3">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="productId"
+                       value="@Model.Id" />
+
+                <button type="submit"
+                        class="btn btn-outline-danger btn-lg w-100 product-action-btn">
+                    ❤️ Add to Wishlist
+                </button>
+
+            </form>
+
+
+            <!-- View Cart -->
+            <a asp-area="Customer"
+               asp-controller="Cart"
+               asp-action="Index"
+               class="btn btn-outline-primary w-100 product-action-btn">
+                🛒 View My Cart
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- REVIEWS & RATINGS -->
+    <!-- ========================================================= -->
+
+    <div class="mt-5 pt-4">
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+
+            <div>
+                <h2 class="fw-bold mb-1">
+                    ⭐ Customer Reviews
+                </h2>
+
+                <p class="text-muted mb-0">
+                    See what customers think about this product.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- Review Success -->
+        @if (TempData["ReviewSuccess"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show"
+                 role="alert">
+
+                ✅ @TempData["ReviewSuccess"]
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+
+            </div>
+        }
+
+
+        <!-- Review Error -->
+        @if (TempData["ReviewError"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show"
+                 role="alert">
+
+                ⚠️ @TempData["ReviewError"]
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+
+            </div>
+        }
+
+
+        <!-- Rating Summary -->
+        <div class="rating-summary-card shadow-sm p-4 mb-4">
+
+            <div class="row g-4 align-items-center">
+
+                <!-- Average -->
+                <div class="col-md-4 text-center">
+
+                    <div class="average-rating">
+                        @averageRating.ToString("0.0")
+                    </div>
+
+                    <div class="rating-stars mb-2">
+                        @GetStars(averageRating)
+                    </div>
+
+                    <div class="text-muted">
+                        Based on @reviewCount
+                        @(reviewCount == 1 ? "review" : "reviews")
+                    </div>
+
+                </div>
+
+
+                <!-- Distribution -->
+                <div class="col-md-8">
+
+                    <!-- 5 Stars -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+
+                        <span style="width:45px;">
+                            5 ⭐
+                        </span>
+
+                        <div class="rating-bar flex-grow-1">
+                            <div class="rating-bar-fill"
+                                 style="width:@GetPercentage(rating5Count)%;">
+                            </div>
+                        </div>
+
+                        <span class="text-muted"
+                              style="width:35px;">
+                            @rating5Count
+                        </span>
+
+                    </div>
+
+
+                    <!-- 4 Stars -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+
+                        <span style="width:45px;">
+                            4 ⭐
+                        </span>
+
+                        <div class="rating-bar flex-grow-1">
+                            <div class="rating-bar-fill"
+                                 style="width:@GetPercentage(rating4Count)%;">
+                            </div>
+                        </div>
+
+                        <span class="text-muted"
+                              style="width:35px;">
+                            @rating4Count
+                        </span>
+
+                    </div>
+
+
+                    <!-- 3 Stars -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+
+                        <span style="width:45px;">
+                            3 ⭐
+                        </span>
+
+                        <div class="rating-bar flex-grow-1">
+                            <div class="rating-bar-fill"
+                                 style="width:@GetPercentage(rating3Count)%;">
+                            </div>
+                        </div>
+
+                        <span class="text-muted"
+                              style="width:35px;">
+                            @rating3Count
+                        </span>
+
+                    </div>
+
+
+                    <!-- 2 Stars -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+
+                        <span style="width:45px;">
+                            2 ⭐
+                        </span>
+
+                        <div class="rating-bar flex-grow-1">
+                            <div class="rating-bar-fill"
+                                 style="width:@GetPercentage(rating2Count)%;">
+                            </div>
+                        </div>
+
+                        <span class="text-muted"
+                              style="width:35px;">
+                            @rating2Count
+                        </span>
+
+                    </div>
+
+
+                    <!-- 1 Star -->
+                    <div class="d-flex align-items-center gap-2">
+
+                        <span style="width:45px;">
+                            1 ⭐
+                        </span>
+
+                        <div class="rating-bar flex-grow-1">
+                            <div class="rating-bar-fill"
+                                 style="width:@GetPercentage(rating1Count)%;">
+                            </div>
+                        </div>
+
+                        <span class="text-muted"
+                              style="width:35px;">
+                            @rating1Count
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- WRITE REVIEW -->
+        <!-- ===================================================== -->
+        @if (User.Identity?.IsAuthenticated == true &&
+                     User.IsInRole("Customer"))
+        {
+            @if (currentUserReview == null)
+            {
+                <div class="review-form-card p-4 mb-4">
+
+                    <h4 class="fw-bold mb-2">
+                        ✍️ Write a Review
+                    </h4>
+
+                    <p class="text-muted">
+                        Share your experience with this product.
+                    </p>
+
+                    <form asp-area="Customer"
+                          asp-controller="ProductReviews"
+                          asp-action="Create"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="productId"
+                               value="@Model.Id" />
+
+
+                        <!-- Rating -->
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Your Rating
+                            </label>
+
+                            <div class="star-input">
+
+                                <input type="radio"
+                                       id="star5"
+                                       name="rating"
+                                       value="5"
+                                       required />
+
+                                <label for="star5"
+                                       title="5 Stars">
+                                    ★
+                                </label>
+
+
+                                <input type="radio"
+                                       id="star4"
+                                       name="rating"
+                                       value="4" />
+
+                                <label for="star4"
+                                       title="4 Stars">
+                                    ★
+                                </label>
+
+
+                                <input type="radio"
+                                       id="star3"
+                                       name="rating"
+                                       value="3" />
+
+                                <label for="star3"
+                                       title="3 Stars">
+                                    ★
+                                </label>
+
+
+                                <input type="radio"
+                                       id="star2"
+                                       name="rating"
+                                       value="2" />
+
+                                <label for="star2"
+                                       title="2 Stars">
+                                    ★
+                                </label>
+
+
+                                <input type="radio"
+                                       id="star1"
+                                       name="rating"
+                                       value="1" />
+
+                                <label for="star1"
+                                       title="1 Star">
+                                    ★
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Comment -->
+                        <div class="mb-3">
+
+                            <label for="comment"
+                                   class="form-label fw-semibold">
+                                Your Review
+                            </label>
+
+                            <textarea id="comment"
+                                      name="comment"
+                                      class="form-control"
+                                      rows="5"
+                                      maxlength="2000"
+                                      placeholder="Write your experience with this product..."
+                                      required></textarea>
+
+                            <div class="form-text">
+                                Maximum 2000 characters.
+                            </div>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="btn btn-primary px-4">
+                            ⭐ Submit Review
+                        </button>
+
+                    </form>
+
+                </div>
+            }
+            else
+            {
+                <!-- Existing User Review -->
+                <div class="alert alert-info mb-4">
+
+                    <div class="d-flex align-items-start gap-3">
+
+                        <div>
+                            <strong>
+                                You have already reviewed this product.
+                            </strong>
+
+                            <div class="small mt-1">
+                                You can edit or delete your review below.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+        else if (User.Identity?.IsAuthenticated != true)
+        {
+            <div class="review-form-card p-4 mb-4 text-center">
+
+                <h5 class="fw-bold">
+                    Want to review this product?
+                </h5>
+
+                <p class="text-muted mb-3">
+                    Login to your customer account to leave a review
+                    after purchasing this product.
+                </p>
+
+                <a asp-area=""
+                   asp-controller="Account"
+                   asp-action="Login"
+                   asp-route-returnUrl="@Context.Request.Path"
+                   class="btn btn-primary">
+                    🔐 Login to Review
+                </a>
+
+            </div>
+        }
+
+
+        <!-- ===================================================== -->
+        <!-- REVIEWS LIST -->
+        <!-- ===================================================== -->
+        @if (reviews.Any())
+        {
+            <div class="mb-3">
+
+                <h4 class="fw-bold">
+                    Customer Feedback
+                </h4>
+
+            </div>
+
+            <div class="d-flex flex-column gap-3">
+
+                @foreach (var review in reviews)
+                {
+                    var reviewerName =
+                        !string.IsNullOrWhiteSpace(review.User?.FullName)
+                            ? review.User.FullName
+                            : "Customer";
+
+                    var reviewerInitial =
+                        !string.IsNullOrWhiteSpace(reviewerName)
+                            ? reviewerName
+                                .Substring(0, 1)
+                                .ToUpper()
+                            : "C";
+
+                    <div class="review-card p-4">
+
+                        <div class="d-flex gap-3">
+
+                            <!-- Avatar -->
+                            <div class="review-avatar">
+                                @reviewerInitial
+                            </div>
+
+
+                            <!-- Review Content -->
+                            <div class="flex-grow-1">
+
+                                <div class="d-flex flex-wrap justify-content-between gap-2">
+
+                                    <div>
+
+                                        <div class="fw-bold">
+                                            @reviewerName
+                                        </div>
+
+                                        <div class="small text-muted">
+                                            @review.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="rating-stars">
+                                        @GetStars(review.Rating)
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mt-3 text-secondary"
+                                     style="white-space:pre-line;">
+                                    @review.Comment
+                                </div>
+
+
+                                @if (review.UpdatedAt.HasValue)
+                                {
+                                    <div class="small text-muted mt-2">
+                                        Edited @(
+                                        review.UpdatedAt.Value
+                                            .ToLocalTime()
+                                            .ToString("dd MMM yyyy")
+                                            )
+                                    </div>
+                                }
+
+                                <!-- Own Review Actions -->
+                                @if (currentUser != null &&
+                                     review.UserId == currentUser.Id)
+                                {
+                                    <div class="mt-3 d-flex gap-2 flex-wrap">
+
+                                        <!-- Edit -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editReviewModal-@review.Id">
+                                            ✏️ Edit
+                                        </button>
+
+
+                                        <!-- Delete -->
+                                        <form asp-area="Customer"
+                                              asp-controller="ProductReviews"
+                                              asp-action="Delete"
+                                              method="post"
+                                              onsubmit="return confirm('Are you sure you want to delete this review?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@review.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                🗑️ Delete
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- EDIT REVIEW MODAL -->
+                    <!-- ================================================= -->
+                    @if (currentUser != null &&
+                                             review.UserId == currentUser.Id)
+                    {
+                        <div class="modal fade"
+                             id="editReviewModal-@review.Id"
+                             tabindex="-1"
+                             aria-hidden="true">
+
+                            <div class="modal-dialog modal-dialog-centered">
+
+                                <div class="modal-content border-0 rounded-4 shadow">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title fw-bold">
+                                            ✏️ Edit Your Review
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+
+                                    <form asp-area="Customer"
+                                          asp-controller="ProductReviews"
+                                          asp-action="Edit"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <div class="modal-body">
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@review.Id" />
+
+
+                                            <!-- Rating -->
+                                            <div class="mb-3">
+
+                                                <label class="form-label fw-semibold">
+                                                    Rating
+                                                </label>
+
+                                                <select name="rating"
+                                                        class="form-select"
+                                                        required>
+
+                                                    <option value="5"
+                                                            selected="@(review.Rating == 5)">
+                                                        ⭐⭐⭐⭐⭐ — Excellent
+                                                    </option>
+
+                                                    <option value="4"
+                                                            selected="@(review.Rating == 4)">
+                                                        ⭐⭐⭐⭐ — Very Good
+                                                    </option>
+
+                                                    <option value="3"
+                                                            selected="@(review.Rating == 3)">
+                                                        ⭐⭐⭐ — Good
+                                                    </option>
+
+                                                    <option value="2"
+                                                            selected="@(review.Rating == 2)">
+                                                        ⭐⭐ — Fair
+                                                    </option>
+
+                                                    <option value="1"
+                                                            selected="@(review.Rating == 1)">
+                                                        ⭐ — Poor
+                                                    </option>
+
+                                                </select>
+
+                                            </div>
+
+
+                                            <!-- Comment -->
+                                            <div class="mb-3">
+
+                                                <label class="form-label fw-semibold">
+                                                    Review
+                                                </label>
+
+                                                <textarea name="comment"
+                                                          class="form-control"
+                                                          rows="5"
+                                                          maxlength="2000"
+                                                          required>@review.Comment</textarea>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="modal-footer">
+
+                                            <button type="button"
+                                                    class="btn btn-light"
+                                                    data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+                                                💾 Save Changes
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+        }
+        else
+        {
+            <!-- Empty Reviews -->
+            <div class="empty-reviews p-5 text-center">
+
+                <div style="font-size:55px;">
+                    ⭐
+                </div>
+
+                <h4 class="fw-bold mt-3">
+                    No Reviews Yet
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Be the first customer to review this product
+                    after purchasing it.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+</div>

@@ -1,0 +1,515 @@
+﻿@model ShopSphere.Models.Coupon
+
+@{
+    ViewData["Title"] = "Coupon Details";
+
+    var isExpired =
+        Model.ExpiryDate.HasValue &&
+        Model.ExpiryDate.Value < DateTime.UtcNow;
+
+    var usageLimitReached =
+        Model.UsageLimit.HasValue &&
+        Model.UsedCount >= Model.UsageLimit.Value;
+}
+
+<style>
+    .coupon-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        border-radius: 20px;
+        padding: 28px;
+    }
+
+    .details-card {
+        border: 0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .coupon-code-box {
+        background: #f8f9fa;
+        border: 2px dashed #0d6efd;
+        border-radius: 16px;
+        padding: 25px;
+        text-align: center;
+    }
+
+    .coupon-code {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        color: #0d6efd;
+    }
+
+    .info-label {
+        color: #6c757d;
+        font-size: .82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        font-size: 1.05rem;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .discount-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0d6efd;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="coupon-header shadow-sm mb-4">
+
+        <div class="d-flex flex-wrap justify-content-between
+            align-items-center gap-3">
+
+            <div>
+                <h1 class="fw-bold mb-2">
+                    🎟️ Coupon Details
+                </h1>
+
+                <p class="mb-0 opacity-75">
+                    View coupon information and manage its status.
+                </p>
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a asp-area="Admin"
+                   asp-controller="Coupons"
+                   asp-action="Index"
+                   class="btn btn-light">
+
+                    ← Back
+
+                </a>
+
+                <a asp-area="Admin"
+                   asp-controller="Coupons"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-warning">
+
+                    ✏️ Edit
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUCCESS MESSAGE -->
+    @if (TempData["CouponSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            ✅ @TempData["CouponSuccess"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <div class="row g-4">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
+
+            <div class="card details-card shadow-sm">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <!-- COUPON CODE -->
+                    <div class="coupon-code-box mb-5">
+
+                        <div class="info-label mb-2">
+                            Coupon Code
+                        </div>
+
+                        <div class="coupon-code">
+                            @Model.Code
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <div class="text-muted mt-2">
+                                @Model.Description
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <!-- DISCOUNT -->
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-md-6">
+
+                            <div class="stat-box">
+
+                                <div class="info-label mb-2">
+                                    Discount Type
+                                </div>
+
+                                <div class="info-value">
+
+                                    @if (Model.DiscountType == "Percentage")
+                                    {
+                                        <span class="badge bg-primary fs-6">
+                                            Percentage
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info text-dark fs-6">
+                                            Fixed Amount
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="stat-box">
+
+                                <div class="info-label mb-2">
+                                    Discount Value
+                                </div>
+
+                                <div class="discount-value">
+
+                                    @if (Model.DiscountType == "Percentage")
+                                    {
+                                        @Model.DiscountValue.ToString("0.##")
+                                        <span>%</span>
+                                    }
+                                    else
+                                    {
+                                        <span>৳</span>
+                                        @Model.DiscountValue.ToString("N2")
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ORDER REQUIREMENT -->
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Minimum Order Amount
+                            </div>
+
+                            <div class="info-value">
+
+                                @if (Model.MinimumOrderAmount > 0)
+                                {
+                                    <span>
+                                        ৳@Model.MinimumOrderAmount.ToString("N2")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No minimum order
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Usage
+                            </div>
+
+                            <div class="info-value">
+
+                                @Model.UsedCount
+
+                                @if (Model.UsageLimit.HasValue)
+                                {
+                                    <span class="text-muted">
+                                        / @Model.UsageLimit.Value
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        / Unlimited
+                                    </span>
+                                }
+
+                            </div>
+
+                            @if (usageLimitReached)
+                            {
+                                <span class="badge bg-warning text-dark mt-2">
+                                    Usage Limit Reached
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4" />
+
+
+                    <!-- VALIDITY -->
+                    <h5 class="fw-bold mb-4">
+                        📅 Validity
+                    </h5>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Start Date
+                            </div>
+
+                            <div class="info-value">
+
+                                @if (Model.StartDate.HasValue)
+                                {
+                                    @(Model.StartDate.Value
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy, hh:mm tt"))
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Available immediately
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Expiry Date
+                            </div>
+
+                            <div class="info-value">
+
+                                @if (Model.ExpiryDate.HasValue)
+                                {
+                                    @(Model.ExpiryDate.Value
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy, hh:mm tt"))
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No expiry date
+                                    </span>
+                                }
+
+                            </div>
+
+                            @if (isExpired)
+                            {
+                                <span class="badge bg-danger mt-2">
+                                    Expired
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <hr class="my-4" />
+
+
+                    <!-- CREATED -->
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Created
+                            </div>
+
+                            <div class="info-value">
+
+                                @(Model.CreatedAt
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy, hh:mm tt"))
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="info-label mb-1">
+                                Coupon ID
+                            </div>
+
+                            <div class="info-value">
+                                #@Model.Id
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-4">
+
+            <div class="card details-card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        ⚙️ Coupon Management
+                    </h5>
+
+
+                    <!-- STATUS -->
+                    <div class="mb-4">
+
+                        <div class="info-label mb-2">
+                            Current Status
+                        </div>
+
+                        @if (!Model.IsActive)
+                        {
+                            <span class="badge bg-secondary fs-6 px-3 py-2">
+                                ⏸️ Inactive
+                            </span>
+                        }
+                        else if (isExpired)
+                        {
+                            <span class="badge bg-danger fs-6 px-3 py-2">
+                                ⛔ Expired
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                                ✅ Active
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <!-- TOGGLE -->
+                    <form asp-area="Admin"
+                          asp-controller="Coupons"
+                          asp-action="ToggleStatus"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          class="mb-3">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn @(Model.IsActive
+                                                                ? "btn-outline-warning"
+                                                                : "btn-outline-success") w-100">
+
+                            @(Model.IsActive
+                                ? "⏸️ Disable Coupon"
+                                : "▶️ Enable Coupon")
+
+                        </button>
+
+                    </form>
+
+
+                    <!-- EDIT -->
+                    <a asp-area="Admin"
+                       asp-controller="Coupons"
+                       asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-primary w-100 mb-3">
+
+                        ✏️ Edit Coupon
+
+                    </a>
+
+
+                    <!-- DELETE -->
+                    <form asp-area="Admin"
+                          asp-controller="Coupons"
+                          asp-action="Delete"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to permanently delete this coupon?');">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-outline-danger w-100">
+
+                            🗑️ Delete Coupon
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

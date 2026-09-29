@@ -1,0 +1,557 @@
+﻿@using ShopSphere.Models
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var recentProducts = ViewBag.RecentProducts as List<Product>;
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+    <div>
+        <h1 class="fw-bold mb-1">
+            Dashboard 📊
+        </h1>
+
+        <p class="text-muted mb-0">
+            Welcome to your ShopSphere admin dashboard.
+        </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+
+        <a asp-area="Admin"
+           asp-controller="Products"
+           asp-action="Create"
+           class="btn btn-primary px-4">
+            + Add Product
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Categories"
+           asp-action="Create"
+           class="btn btn-outline-primary px-4">
+            + Add Category
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- Main Statistics -->
+<div class="row g-4 mb-4">
+
+    <!-- Total Products -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Total Products
+                        </p>
+
+                        <h2 class="fw-bold mb-0">
+                            @ViewBag.TotalProducts
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1">
+                        📦
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Total Categories -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Total Categories
+                        </p>
+
+                        <h2 class="fw-bold mb-0">
+                            @ViewBag.TotalCategories
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1">
+                        📁
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Active Products -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Active Products
+                        </p>
+
+                        <h2 class="fw-bold text-success mb-0">
+                            @ViewBag.ActiveProducts
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1">
+                        🟢
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Total Users -->
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Total Users
+                        </p>
+
+                        <h2 class="fw-bold text-primary mb-0">
+                            @ViewBag.TotalUsers
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1">
+                        👥
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Product Status Statistics -->
+<div class="row g-4 mb-4">
+
+    <!-- Low Stock -->
+    <div class="col-lg-4">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Low Stock Products
+                        </p>
+
+                        <h3 class="fw-bold text-warning mb-1">
+                            @ViewBag.LowStockProducts
+                        </h3>
+
+                        <small class="text-muted">
+                            Products with 1–10 items left
+                        </small>
+
+                    </div>
+
+                    <div class="fs-1">
+                        ⚠️
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Out of Stock -->
+    <div class="col-lg-4">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Out of Stock
+                        </p>
+
+                        <h3 class="fw-bold text-danger mb-1">
+                            @ViewBag.OutOfStockProducts
+                        </h3>
+
+                        <small class="text-muted">
+                            Products that need restocking
+                        </small>
+
+                    </div>
+
+                    <div class="fs-1">
+                        🔴
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Inactive Products -->
+    <div class="col-lg-4">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <p class="text-muted mb-2">
+                            Inactive Products
+                        </p>
+
+                        <h3 class="fw-bold text-secondary mb-1">
+                            @ViewBag.InactiveProducts
+                        </h3>
+
+                        <small class="text-muted">
+                            Currently hidden from customers
+                        </small>
+
+                    </div>
+
+                    <div class="fs-1">
+                        ⏸️
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Recent Products + Quick Actions -->
+<div class="row g-4">
+
+    <!-- Recent Products -->
+    <div class="col-lg-8">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <div>
+
+                        <h4 class="fw-bold mb-1">
+                            Recent Products
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Latest products added to your marketplace.
+                        </p>
+
+                    </div>
+
+                    <a asp-area="Admin"
+                       asp-controller="Products"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-primary">
+                        View All →
+                    </a>
+
+                </div>
+
+
+                @if (recentProducts != null && recentProducts.Any())
+                {
+                    <div class="table-responsive">
+
+                        <table class="table align-middle mb-0">
+
+                            <thead class="table-light">
+
+                                <tr>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Category
+                                    </th>
+
+                                    <th>
+                                        Price
+                                    </th>
+
+                                    <th>
+                                        Stock
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @foreach (var product in recentProducts)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <div class="fw-semibold">
+                                                @product.Name
+                                            </div>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="badge bg-light text-dark border">
+                                                @product.Category?.Name
+                                            </span>
+
+                                        </td>
+
+
+                                        <td class="fw-bold text-primary">
+
+                                            ৳ @product.Price.ToString("N2")
+
+                                        </td>
+
+
+                                        <td>
+
+                                            @if (product.StockQuantity > 10)
+                                            {
+                                                <span class="badge bg-success">
+                                                    @product.StockQuantity In Stock
+                                                </span>
+                                            }
+                                            else if (product.StockQuantity > 0)
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    @product.StockQuantity Low
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    Out of Stock
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+
+                        <div class="fs-1">
+                            📦
+                        </div>
+
+                        <h5 class="fw-bold mt-3">
+                            No products yet
+                        </h5>
+
+                        <p class="text-muted">
+                            Start by adding your first product.
+                        </p>
+
+                        <a asp-area="Admin"
+                           asp-controller="Products"
+                           asp-action="Create"
+                           class="btn btn-primary">
+                            + Add Product
+                        </a>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold mb-1">
+                    Quick Actions ⚡
+                </h4>
+
+                <p class="text-muted mb-4">
+                    Manage your marketplace faster.
+                </p>
+
+
+                <div class="d-grid gap-3">
+
+                    <!-- Add Product -->
+                    <a asp-area="Admin"
+                       asp-controller="Products"
+                       asp-action="Create"
+                       class="btn btn-primary">
+
+                        📦 Add New Product
+
+                    </a>
+
+
+                    <!-- Add Category -->
+                    <a asp-area="Admin"
+                       asp-controller="Categories"
+                       asp-action="Create"
+                       class="btn btn-outline-primary">
+
+                        📁 Add New Category
+
+                    </a>
+
+
+                    <!-- Low Stock -->
+                    <a asp-area="Admin"
+                       asp-controller="Products"
+                       asp-action="Index"
+                       asp-route-stock="lowstock"
+                       class="btn btn-outline-warning">
+
+                        ⚠️ View Low Stock Products
+
+                    </a>
+
+
+                    <!-- Out of Stock -->
+                    <a asp-area="Admin"
+                       asp-controller="Products"
+                       asp-action="Index"
+                       asp-route-stock="outofstock"
+                       class="btn btn-outline-danger">
+
+                        🔴 View Out of Stock
+
+                    </a>
+
+
+                    <!-- AI Sales Prediction -->
+                    <a asp-area="Admin"
+                       asp-controller="SalesPrediction"
+                       asp-action="Index"
+                       class="btn btn-outline-success">
+
+                        🤖 AI Sales Prediction
+
+                    </a>
+
+
+                    <!-- AI Inventory Prediction -->
+                    <a asp-area="Admin"
+                       asp-controller="InventoryPrediction"
+                       asp-action="Index"
+                       class="btn btn-outline-primary">
+
+                        📦 AI Inventory Prediction
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
